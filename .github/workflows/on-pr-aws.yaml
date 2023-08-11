@@ -9,6 +9,10 @@ on:
       - "packer/scripts/**"
       - ".github/workflows/on-pr-aws.yaml"
 
+permissions:
+  id-token: write
+  contents: read
+      
 jobs:
   Test_AMI_Build:
     runs-on: ubuntu-latest
