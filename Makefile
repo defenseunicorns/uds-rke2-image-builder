@@ -2,7 +2,7 @@
 AWS_DIR := packer/aws
 
 ######################
-# Builds + Tests
+# Make Targets
 ######################
 .PHONY: help
 help: ## Show this help message.
@@ -11,16 +11,24 @@ help: ## Show this help message.
 		| awk 'BEGIN {FS = ":.*?## "; printf "\nUsage:\n"}; {printf "  %-15s %s\n", $$1, $$2}'
 	@echo
 
-.PHONY: build-ami
-build-ami: ## Build the AMI for AWS.
-	@cd $(AWS_DIR) && packer init . && packer build -var "ubuntu_pro_token=$(ubuntu_pro_token)" .
+.PHONY: publish-ami
+publish-ami: ## Build and Publish the AMI for AWS.
+	@cd $(AWS_DIR) && packer init .
+	@cd $(AWS_DIR) && packer build -var "ubuntu_pro_token=$(ubuntu_pro_token)" .
 
 .PHONY: test-ami
-test-ami: fmt-validate-ami ## Test the AMI build for AWS.
+test-ami: fmt-ami validate-ami build-ami ## fmt, validate, and build the AMI for AWS.
+
+.PHONY: build-ami
+build-ami: ## Build the AMI for AWS.
+	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=$(ubuntu_pro_token)" .
 
-.PHONY: fmt-validate-ami
-fmt-validate-ami: ## Run packer formatting and validation for the AWS AMI.
+.PHONY: fmt-ami
+fmt-ami: ## Run packer fmt for the AWS AMI.
 	@cd $(AWS_DIR) && packer fmt .
+
+.PHONY: validate-ami
+validate-ami: ## Run packer validation for the AWS AMI.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer validate .

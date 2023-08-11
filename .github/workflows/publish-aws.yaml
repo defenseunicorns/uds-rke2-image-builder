@@ -1,20 +1,20 @@
 name: AWS AMI
 
 on:
-  pull_request:
+  push:
     branches:
       - main
     paths:
       - "packer/aws/**"
       - "packer/scripts/**"
-      - ".github/workflows/on-pr-aws.yaml"
+      - ".github/workflows/publish-aws.yaml"
 
 permissions:
   id-token: write
   contents: read
       
 jobs:
-  test:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -27,7 +27,5 @@ jobs:
           aws-region: us-west-2
           # 21600 seconds == 6 hours
           role-duration-seconds: 21600
-      - name: Validate AMI
-        run: make validate-ami
-      - name: Build AMI
-        run: make build-ami
+      - name: Publish AMI
+        run: make publish-ami
