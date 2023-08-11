@@ -10,7 +10,7 @@ on:
       - ".github/workflows/on-pr-aws.yaml"
 
 jobs:
-  fmt-validate-ami:
+  Test_AMI_Build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
