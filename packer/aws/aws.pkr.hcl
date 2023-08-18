@@ -56,4 +56,9 @@ build {
     timeout         = "15m"
   }
 
+  provisioner "shell" {
+    inline  = ["sudo apt-get install awscli -y"]
+    timeout = "15m"
+  }
+
 }
