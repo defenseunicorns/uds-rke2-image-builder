@@ -16,6 +16,11 @@ publish-ami: ## Build and Publish the AMI for AWS.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer build -var "ubuntu_pro_token=$(ubuntu_pro_token)" .
 
+.PHONY: publish-ami-rhel
+publish-ami-rhel: ## Build and Publish the RHEL AMI for AWS.
+	@cd $(AWS_DIR) && packer init .
+	@cd $(AWS_DIR) && packer build --var-file=rhel.pkrvars.hcl .
+
 .PHONY: test-ami
 test-ami: fmt-ami validate-ami build-ami ## fmt, validate, and build the AMI for AWS.
 
@@ -23,6 +28,11 @@ test-ami: fmt-ami validate-ami build-ami ## fmt, validate, and build the AMI for
 build-ami: ## Build the AMI for AWS.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=$(ubuntu_pro_token)" .
+
+.PHONY: build-ami-rhel
+build-ami-rhel: ## Build the RHEL AMI for AWS.
+	@cd $(AWS_DIR) && packer init .
+	@cd $(AWS_DIR) && packer build -var "skip_create_ami=true" --var-file=rhel.pkrvars.hcl .
 
 .PHONY: fmt-ami
 fmt-ami: ## Run packer fmt for the AWS AMI.
@@ -32,3 +42,8 @@ fmt-ami: ## Run packer fmt for the AWS AMI.
 validate-ami: ## Run packer validation for the AWS AMI.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer validate .
+
+.PHONY: validate-ami-rhel
+validate-ami-rhel: ## Run packer validation for the AWS RHEL AMI.
+	@cd $(AWS_DIR) && packer init .
+	@cd $(AWS_DIR) && packer validate --var-file=rhel.pkrvars.hcl .

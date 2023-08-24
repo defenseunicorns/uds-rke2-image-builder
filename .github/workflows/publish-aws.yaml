@@ -29,3 +29,5 @@ jobs:
           role-duration-seconds: 21600
       - name: Publish AMI
         run: make publish-ami
+      - name: Publish AMI
+        run: make publish-ami-rhel

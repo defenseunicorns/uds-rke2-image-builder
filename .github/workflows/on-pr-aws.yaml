@@ -31,3 +31,7 @@ jobs:
         run: make validate-ami
       - name: Build AMI
         run: make build-ami
+      - name: Validate RHEL AMI
+        run: make validate-ami-rhel
+      - name: Build RHEL AMI
+        run: make build-ami-rhel
