@@ -1,6 +1,7 @@
 #!/bin/bash
 # Install dependencies and cli tools needed by other packer scripts
 
+# Detect distro. This works fine with only rhel and ubuntu in the list, but will not work as is if you need to distinguish ubuntu/debian or rhel/fedora
 DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
 
 if [[ $DISTRO == "rhel" ]]; then
