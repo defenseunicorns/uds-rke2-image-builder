@@ -42,7 +42,7 @@ variable "ssh_username" {
 }
 
 variable "base_ami_owners" {
-  type        = list
+  type        = list(string)
   description = "List of owners to filter looking up the base ami"
   default     = ["amazon"]
 }
