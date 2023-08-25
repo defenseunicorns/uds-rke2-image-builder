@@ -1,7 +1,6 @@
 variable "ami_name" {
   type        = string
   description = "Name to use for the published AMI"
-  default     = "uds-rke2-ubuntu"
 }
 
 variable "timestamp" {
@@ -13,7 +12,6 @@ variable "timestamp" {
 variable "base_ami_name" {
   type        = string
   description = "AMI to build on top of, scripts validated on Ubuntu 20.04"
-  default     = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20230725"
 }
 
 variable "rke2_version" {
@@ -38,7 +36,6 @@ variable "skip_create_ami" {
 variable "ssh_username" {
   type        = string
   description = "Username used to connect to instance over SSH"
-  default     = "ubuntu"
 }
 
 variable "base_ami_owners" {
