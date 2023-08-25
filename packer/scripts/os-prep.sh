@@ -68,4 +68,15 @@ echo "xt_statistic" >> /etc/modules-load.d/istio-iptables.conf
 
 # cgroupsv2 for RKE2 + NeuVector
 sed -i 's/GRUB_CMDLINE_LINUX=\"/GRUB_CMDLINE_LINUX=\"systemd.unified_cgroup_hierarchy=1/' /etc/default/grub
-update-grub
+
+BOOT_TYPE=$([ -d /sys/firmware/efi ] && echo UEFI || echo BIOS)
+
+if [[ $DISTRO == "rhel" ]]; then
+    if [[ $BOOT_TYPE == "BIOS" ]]; then
+        grub2-mkconfig -o /boot/grub2/grub.cfg
+    else
+        grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+    fi
+elif [[ $DISTRO == "ubuntu" ]]; then
+    update-grub
+fi
