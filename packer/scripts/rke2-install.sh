@@ -7,12 +7,12 @@ if [[ $(systemctl list-units --full -all | grep -Poi "NetworkManager.service") ]
 	[keyfile]
 	unmanaged-devices=interface-name:cali*;interface-name:flannel*
 	EOF
-	systemctl reload NetworkManager
+  systemctl reload NetworkManager
 fi
 
 # If present, disable firewalld which interferes with cluster networking
 if [[ $(systemctl list-units --full -all | grep -Poi "firewalld.service") ]]; then
-	systemctl disable firewalld.service
+  systemctl disable firewalld.service
 fi
 
 # If present, disable additional network manager services that interfere with cluster networking
