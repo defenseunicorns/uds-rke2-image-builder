@@ -2,7 +2,7 @@
 
 # If Network Manager is being used configure it to ignore calico/flannel network interfaces
 if [[ $(systemctl list-units --full -all | grep -Poi "NetworkManager.service") ]]; then
-    # Indent with tabs to prevent spaces in heredoc output
+  # Indent with tabs to prevent spaces in heredoc output
 	cat <<- EOF > /etc/NetworkManager/conf.d/rke2-canal.conf
 	[keyfile]
 	unmanaged-devices=interface-name:cali*;interface-name:flannel*
@@ -10,12 +10,17 @@ if [[ $(systemctl list-units --full -all | grep -Poi "NetworkManager.service") ]
 	systemctl reload NetworkManager
 fi
 
+# If present, disable firewalld which interferes with cluster networking
+if [[ $(systemctl list-units --full -all | grep -Poi "firewalld.service") ]]; then
+	systemctl disable firewalld.service
+fi
+
 # If present, disable additional network manager services that interfere with cluster networking
 if [[ $(systemctl list-units --full -all | grep -Poi "nm-cloud-setup.service") ]]; then
-    systemctl disable nm-cloud-setup.service
+  systemctl disable nm-cloud-setup.service
 fi
 if [[ $(systemctl list-units --full -all | grep -Poi "nm-cloud-setup.timer") ]]; then
-    systemctl disable nm-cloud-setup.timer
+  systemctl disable nm-cloud-setup.timer
 fi
 
 echo "Installing RKE2 $INSTALL_RKE2_VERSION..."
