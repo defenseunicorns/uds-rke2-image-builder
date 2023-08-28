@@ -11,7 +11,7 @@ variable "timestamp" {
 
 variable "base_ami_name" {
   type        = string
-  description = "AMI to build on top of, scripts validated on Ubuntu 20.04"
+  description = "AMI to build on top of, builds validated against Ubuntu 20.04 and RHEL8"
 }
 
 variable "rke2_version" {

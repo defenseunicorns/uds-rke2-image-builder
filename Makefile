@@ -25,7 +25,7 @@ publish-ami-rhel: ## Build and Publish the RHEL AMI for AWS.
 test-ami-ubuntu: fmt-ami validate-ami-ubuntu build-ami-ubuntu ## fmt, validate, and build the AMI for AWS.
 
 .PHONY: test-ami-rhel
-test-ami-ubuntu: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and build the AMI for AWS.
+test-ami-rhel: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and build the AMI for AWS.
 
 .PHONY: build-ami-ubuntu
 build-ami-ubuntu: ## Build the AMI for AWS.
