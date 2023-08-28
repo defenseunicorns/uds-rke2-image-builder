@@ -11,24 +11,42 @@ help: ## Show this help message.
 		| awk 'BEGIN {FS = ":.*?## "; printf "\nUsage:\n"}; {printf "  %-15s %s\n", $$1, $$2}'
 	@echo
 
-.PHONY: publish-ami
-publish-ami: ## Build and Publish the AMI for AWS.
+.PHONY: publish-ami-ubuntu
+publish-ami-ubuntu: ## Build and Publish the AMI for AWS.
 	@cd $(AWS_DIR) && packer init .
-	@cd $(AWS_DIR) && packer build -var "ubuntu_pro_token=$(ubuntu_pro_token)" .
+	@cd $(AWS_DIR) && packer build -var "ubuntu_pro_token=$(ubuntu_pro_token)" --var-file=ubuntu.pkrvars.hcl .
 
-.PHONY: test-ami
-test-ami: fmt-ami validate-ami build-ami ## fmt, validate, and build the AMI for AWS.
-
-.PHONY: build-ami
-build-ami: ## Build the AMI for AWS.
+.PHONY: publish-ami-rhel
+publish-ami-rhel: ## Build and Publish the RHEL AMI for AWS.
 	@cd $(AWS_DIR) && packer init .
-	@cd $(AWS_DIR) && packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=$(ubuntu_pro_token)" .
+	@cd $(AWS_DIR) && packer build --var-file=rhel.pkrvars.hcl .
+
+.PHONY: test-ami-ubuntu
+test-ami-ubuntu: fmt-ami validate-ami-ubuntu build-ami-ubuntu ## fmt, validate, and build the AMI for AWS.
+
+.PHONY: test-ami-rhel
+test-ami-rhel: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and build the AMI for AWS.
+
+.PHONY: build-ami-ubuntu
+build-ami-ubuntu: ## Build the AMI for AWS.
+	@cd $(AWS_DIR) && packer init .
+	@cd $(AWS_DIR) && packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=$(ubuntu_pro_token)" --var-file=ubuntu.pkrvars.hcl .
+
+.PHONY: build-ami-rhel
+build-ami-rhel: ## Build the RHEL AMI for AWS.
+	@cd $(AWS_DIR) && packer init .
+	@cd $(AWS_DIR) && packer build -var "skip_create_ami=true" --var-file=rhel.pkrvars.hcl .
 
 .PHONY: fmt-ami
 fmt-ami: ## Run packer fmt for the AWS AMI.
 	@cd $(AWS_DIR) && packer fmt .
 
-.PHONY: validate-ami
-validate-ami: ## Run packer validation for the AWS AMI.
+.PHONY: validate-ami-ubuntu
+validate-ami-ubuntu: ## Run packer validation for the AWS AMI.
 	@cd $(AWS_DIR) && packer init .
-	@cd $(AWS_DIR) && packer validate .
+	@cd $(AWS_DIR) && packer validate --var-file=ubuntu.pkrvars.hcl .
+
+.PHONY: validate-ami-rhel
+validate-ami-rhel: ## Run packer validation for the AWS RHEL AMI.
+	@cd $(AWS_DIR) && packer init .
+	@cd $(AWS_DIR) && packer validate --var-file=rhel.pkrvars.hcl .

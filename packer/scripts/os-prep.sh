@@ -1,9 +1,11 @@
 #!/bin/bash
 
+# Detect distro. This works fine with only rhel and ubuntu in the list, but will not work as is if you need to distinguish ubuntu/debian or rhel/fedora
+DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
+
 echo "Performing OS prep necessary for DUBBD on RKE2..."
 
 # iptables for RKE2
-apt-get install iptables-persistent -y
 iptables -A INPUT -p tcp -m tcp --dport 2379 -m state --state NEW -j ACCEPT
 iptables -A INPUT -p tcp -m tcp --dport 2380 -m state --state NEW -j ACCEPT
 iptables -A INPUT -p tcp -m tcp --dport 9345 -m state --state NEW -j ACCEPT
@@ -21,7 +23,14 @@ iptables -A INPUT -p udp -m udp --dport 51820 -m state --state NEW -j ACCEPT
 iptables -A INPUT -p udp -m udp --dport 51821 -m state --state NEW -j ACCEPT
 iptables -A INPUT -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -p icmp --icmp-type 0 -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables-save > /etc/iptables/rules.v4
+if [[ $DISTRO == "rhel" ]]; then
+    # Save nftables and make them load when nftables starts
+    nft -s list ruleset > /etc/nftables/rules.v4.nft
+    echo "include \"/etc/nftables/rules.v4.nft\"" >> /etc/sysconfig/nftables.conf
+    systemctl enable nftables
+elif [[ $DISTRO == "ubuntu" ]]; then
+    iptables-save > /etc/iptables/rules.v4
+fi
 
 echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf
 echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf
@@ -59,4 +68,15 @@ echo "xt_statistic" >> /etc/modules-load.d/istio-iptables.conf
 
 # cgroupsv2 for RKE2 + NeuVector
 sed -i 's/GRUB_CMDLINE_LINUX=\"/GRUB_CMDLINE_LINUX=\"systemd.unified_cgroup_hierarchy=1/' /etc/default/grub
-update-grub
+
+BOOT_TYPE=$([ -d /sys/firmware/efi ] && echo UEFI || echo BIOS)
+
+if [[ $DISTRO == "rhel" ]]; then
+    if [[ $BOOT_TYPE == "BIOS" ]]; then
+        grub2-mkconfig -o /boot/grub2/grub.cfg
+    else
+        grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+    fi
+elif [[ $DISTRO == "ubuntu" ]]; then
+    update-grub
+fi

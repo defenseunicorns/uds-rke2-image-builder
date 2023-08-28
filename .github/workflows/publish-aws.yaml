@@ -14,7 +14,7 @@ permissions:
   contents: read
       
 jobs:
-  publish:
+  publish-ubuntu:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -27,5 +27,20 @@ jobs:
           aws-region: us-west-2
           # 21600 seconds == 6 hours
           role-duration-seconds: 21600
-      - name: Publish AMI
-        run: make publish-ami
+      - name: Publish Ubuntu AMI
+        run: make publish-ami-ubuntu
+  publish-rhel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_COMMERCIAL_ROLE_TO_ASSUME }}
+          role-session-name: ${{ github.job || github.event.client_payload.pull_request.head.sha || github.sha }}
+          aws-region: us-west-2
+          # 21600 seconds == 6 hours
+          role-duration-seconds: 21600
+      - name: Publish RHEL AMI
+        run: make publish-ami-rhel
