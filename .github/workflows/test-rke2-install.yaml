@@ -27,6 +27,10 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.event.client_payload.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.client_payload.pull_request.head.ref || github.ref_name }}
       - name: Parse Args
         id: parse
         uses: ./.github/actions/parse-test
@@ -37,10 +41,10 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-        # with:
-        #   token: ${{ secrets.GITHUB_TOKEN }}
-        #   repository: ${{ github.event.client_payload.pull_request.head.repo.full_name || github.repository }}
-        #   ref: ${{ github.event.client_payload.pull_request.head.ref || github.ref_name }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.event.client_payload.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.client_payload.pull_request.head.ref || github.ref_name }}
       - name: Update Comment
         uses: ./.github/actions/comment
         with:
@@ -68,6 +72,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.event.client_payload.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.client_payload.pull_request.head.ref || github.ref_name }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
