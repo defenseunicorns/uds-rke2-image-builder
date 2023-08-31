@@ -44,5 +44,5 @@ runs:
         if [ ${#TEST_DISTROS[@]} -eq 0 ]; then
           printf "test_distros=""\n" >> $GITHUB_OUTPUT
         else
-          printf "test_distros=%s\n" "$(jq --compact-output --null-input '$ARGS.positional' --args -- "${TEST_DISTROS[@]}")" >> $GITHUB_OUTPUT
+          printf "test_distros=%s\n" "$(jq --compact-output --null-input '$ARGS.positional' --args -- "${TEST_DISTROS[@],,}")" >> $GITHUB_OUTPUT
         fi
