@@ -3,6 +3,9 @@ name: Test Creating RKE2 Cluster
 on:
   repository_dispatch:
     types: [test-command]
+  pull_request:
+    branches:
+      - main
 
 permissions:
   id-token: write
@@ -71,7 +74,7 @@ jobs:
     if: ${{ needs.parse.outputs.test-distros != '' }}
     strategy:
       matrix:
-        test-distros: ${{ fromJson(needs.parse.outputs.test-distros) }}
+        test-distros: [ubuntu, rhel]
 
     name: Test ${{ matrix.test-distros }} AMI
 
