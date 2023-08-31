@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 # Dirpaths for flavors
 AWS_DIR := packer/aws
 
@@ -31,7 +33,7 @@ test-ami-rhel: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and bu
 
 .PHONY: e2e-ubuntu
 e2e-ubuntu: validate-ami-ubuntu publish-ami-ubuntu
-	@TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
+	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	cd $(TEST_TF_DIR); \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-ci-state-bucket" \
@@ -46,11 +48,11 @@ e2e-ubuntu: validate-ami-ubuntu publish-ami-ubuntu
 	for snapshot in $${snapshot_ids}; do \
 		echo "$${snapshot}"; \
 		aws ec2 delete-snapshot --snapshot-id "$${snapshot}"; \
-	done 
+	done
 
 .PHONY: e2e-rhel
 e2e-rhel: validate-ami-rhel publish-ami-rhel
-	@TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
+	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	cd $(TEST_TF_DIR); \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-ci-state-bucket" \
@@ -65,7 +67,7 @@ e2e-rhel: validate-ami-rhel publish-ami-rhel
 	for snapshot in $${snapshot_ids}; do \
 		echo "$${snapshot}"; \
 		aws ec2 delete-snapshot --snapshot-id "$${snapshot}"; \
-	done 
+	done
 
 .PHONY: build-ami-ubuntu
 build-ami-ubuntu: ## Build the AMI for AWS.
