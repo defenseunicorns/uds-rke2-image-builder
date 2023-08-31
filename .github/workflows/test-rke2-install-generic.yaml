@@ -93,41 +93,7 @@ jobs:
           aws-region: us-west-2
           role-duration-seconds: 21600
 
-      - name: Validate ${{ matrix.test-distros }} AMI
-        run: make validate-ami-${{ matrix.test-distros }}
-
-      - name: Publish ${{ matrix.test-distros }} AMI
-        run: make publish-ami-${{ matrix.test-distros }}
-
-      - name: Grab AMI ID
-        run: echo "TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' manifest.json | cut -d ":" -f2)" >> $GITHUB_ENV
-
-      - name: Create RKE2 cluster
+      - name: Test ${{ matrix.test-distros }} AMI
         env:
           SHA: ${{ github.sha }}
-        run: |
-          terraform init -force-copy \
-            -backend-config="bucket=uds-ci-state-bucket" \
-            -backend-config="key=tfstate/ci/install/${SHA:0:7}-rke2.tfstate" \
-            -backend-config="region=us-west-2" \
-            -backend-config="dynamodb_table=uds-ci-state-dynamodb"
-          terraform plan -var="ami_id=$TEST_AMI_ID" -out=rke2-plan
-          sleep 15 # time to review
-          terraform apply -var="ami_id=$TEST_AMI_ID" -auto-approve rke2-plan
-          kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.21"
-          kubectl apply -f storage-class.yaml
-        working-directory: .github/workflows/rke2
-
-      - name: Teardown RKE2 cluster
-        if: always()
-        run: terraform destroy -auto-approve
-        working-directory: .github/workflows/rke2
-
-      - name: Destroy Test AMI
-        run: |
-          snapshot_ids=$(aws ec2 describe-images --image-ids "$TEST_AMI_ID" | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId)
-          aws ec2 deregister-image --image-id $TEST_AMI_ID
-          for snapshot in $snapshot_ids; do 
-            echo "$snapshot"
-            aws ec2 delete-snapshot --snapshot-id "$snapshot"
-          done
+        run: make e2e-${{ matrix.test-distros }}
