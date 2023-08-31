@@ -30,9 +30,8 @@ test-ami-ubuntu: fmt-ami validate-ami-ubuntu build-ami-ubuntu ## fmt, validate, 
 test-ami-rhel: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and build the AMI for AWS.
 
 .PHONY: e2e-ubuntu
-e2e-ubuntu: 
-	validate-ami-ubuntu publish-ami-ubuntu
-	TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
+e2e-ubuntu: validate-ami-ubuntu publish-ami-ubuntu
+	@TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	cd $(TEST_TF_DIR); \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-ci-state-bucket" \
@@ -50,9 +49,8 @@ e2e-ubuntu:
 	done 
 
 .PHONY: e2e-rhel
-e2e-rhel: 
-	validate-ami-rhel publish-ami-rhel
-	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
+e2e-rhel: validate-ami-rhel publish-ami-rhel
+	@TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	cd $(TEST_TF_DIR); \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-ci-state-bucket" \
