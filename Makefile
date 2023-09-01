@@ -84,6 +84,7 @@ test-cluster:
 .PHONY: teardown-infra
 teardown-infra:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
+	cd $(TEST_TF_DIR); \
 	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
 	snapshot_ids=$$(aws ec2 describe-images --image-ids "$${TEST_AMI_ID}" | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId); \
 	aws ec2 deregister-image --image-id $${TEST_AMI_ID}; \

@@ -108,4 +108,5 @@ jobs:
         run: make test-cluster
 
       - name: Teardown test infrastructure
+        if: always()
         run: make teardown-infra
