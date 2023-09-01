@@ -91,6 +91,8 @@ teardown-infra:
 	snapshot_ids=$$(aws ec2 describe-images --image-ids "$${TEST_AMI_ID}" | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId); \
 	aws ec2 deregister-image --image-id $${TEST_AMI_ID}; \
 	for snapshot in $${snapshot_ids}; do \
-		echo "$${snapshot}"; \
-		aws ec2 delete-snapshot --snapshot-id "$${snapshot}"; \
+		if [[ $${snapshot} == snap* ]]; then \
+			echo "Deleting snapshot: $${snapshot}"; \
+			aws ec2 delete-snapshot --snapshot-id "$${snapshot}"; \
+		fi \
 	done
