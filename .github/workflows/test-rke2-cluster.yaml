@@ -96,7 +96,16 @@ jobs:
           aws-region: us-west-2
           role-duration-seconds: 21600
 
+      - name: Validate ${{ matrix.test-distros }} AMI
+        run: make validate-ami-${{ matrix.test-distros }}
+
+      - name: Publish ${{ matrix.test-distros }} AMI
+        run: make publish-ami-${{ matrix.test-distros }}
+
       - name: Test ${{ matrix.test-distros }} AMI
         env:
           SHA: ${{ github.sha }}
-        run: make e2e-${{ matrix.test-distros }}
+        run: make test-cluster
+
+      - name: Teardown test infrastructure
+        run: make teardown-infra

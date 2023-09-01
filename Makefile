@@ -15,6 +15,10 @@ help: ## Show this help message.
 		| awk 'BEGIN {FS = ":.*?## "; printf "\nUsage:\n"}; {printf "  %-15s %s\n", $$1, $$2}'
 	@echo
 
+######################
+# Packer Targets
+######################
+
 .PHONY: publish-ami-ubuntu
 publish-ami-ubuntu: ## Build and Publish the AMI for AWS.
 	@cd $(AWS_DIR) && packer init .
@@ -24,50 +28,6 @@ publish-ami-ubuntu: ## Build and Publish the AMI for AWS.
 publish-ami-rhel: ## Build and Publish the RHEL AMI for AWS.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer build --var-file=rhel.pkrvars.hcl .
-
-.PHONY: test-ami-ubuntu
-test-ami-ubuntu: fmt-ami validate-ami-ubuntu build-ami-ubuntu ## fmt, validate, and build the AMI for AWS.
-
-.PHONY: test-ami-rhel
-test-ami-rhel: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and build the AMI for AWS.
-
-.PHONY: e2e-ubuntu
-e2e-ubuntu: validate-ami-ubuntu publish-ami-ubuntu
-	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
-	cd $(TEST_TF_DIR); \
-	terraform init -force-copy \
-		-backend-config="bucket=uds-ci-state-bucket" \
-		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-ubuntu-rke2.tfstate" \
-		-backend-config="region=us-west-2" \
-		-backend-config="dynamodb_table=uds-ci-state-dynamodb"; \
-	terraform apply -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
-	kubectl get nodes; \
-	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
-	snapshot_ids=$$(aws ec2 describe-images --image-ids "$${TEST_AMI_ID}" | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId); \
-	aws ec2 deregister-image --image-id $${TEST_AMI_ID}; \
-	for snapshot in $${snapshot_ids}; do \
-		echo "$${snapshot}"; \
-		aws ec2 delete-snapshot --snapshot-id "$${snapshot}"; \
-	done
-
-.PHONY: e2e-rhel
-e2e-rhel: validate-ami-rhel publish-ami-rhel
-	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
-	cd $(TEST_TF_DIR); \
-	terraform init -force-copy \
-		-backend-config="bucket=uds-ci-state-bucket" \
-		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-rhel-rke2.tfstate" \
-		-backend-config="region=us-west-2" \
-		-backend-config="dynamodb_table=uds-ci-state-dynamodb"; \
-	terraform apply -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
-	kubectl get nodes; \
-	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
-	snapshot_ids=$$(aws ec2 describe-images --image-ids "$${TEST_AMI_ID}" | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId); \
-	aws ec2 deregister-image --image-id $${TEST_AMI_ID}; \
-	for snapshot in $${snapshot_ids}; do \
-		echo "$${snapshot}"; \
-		aws ec2 delete-snapshot --snapshot-id "$${snapshot}"; \
-	done
 
 .PHONY: build-ami-ubuntu
 build-ami-ubuntu: ## Build the AMI for AWS.
@@ -92,3 +52,42 @@ validate-ami-ubuntu: ## Run packer validation for the AWS AMI.
 validate-ami-rhel: ## Run packer validation for the AWS RHEL AMI.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer validate --var-file=rhel.pkrvars.hcl .
+
+######################
+# Test Targets
+######################
+
+.PHONY: test-ami-ubuntu
+test-ami-ubuntu: fmt-ami validate-ami-ubuntu build-ami-ubuntu ## fmt, validate, and build the AMI for AWS.
+
+.PHONY: test-ami-rhel
+test-ami-rhel: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and build the AMI for AWS.
+
+.PHONY: e2e-ubuntu
+e2e-ubuntu: validate-ami-ubuntu publish-ami-ubuntu test-cluster teardown-infra
+
+.PHONY: e2e-rhel
+e2e-rhel: validate-ami-rhel publish-ami-rhel test-cluster teardown-infra
+
+.PHONY: test-cluster
+test-cluster:
+	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
+	cd $(TEST_TF_DIR); \
+	terraform init -force-copy \
+		-backend-config="bucket=uds-ci-state-bucket" \
+		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-rhel-rke2.tfstate" \
+		-backend-config="region=us-west-2" \
+		-backend-config="dynamodb_table=uds-ci-state-dynamodb"; \
+	terraform apply -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
+	kubectl get nodes
+
+.PHONY: teardown-infra
+teardown-infra:
+	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
+	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
+	snapshot_ids=$$(aws ec2 describe-images --image-ids "$${TEST_AMI_ID}" | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId); \
+	aws ec2 deregister-image --image-id $${TEST_AMI_ID}; \
+	for snapshot in $${snapshot_ids}; do \
+		echo "$${snapshot}"; \
+		aws ec2 delete-snapshot --snapshot-id "$${snapshot}"; \
+	done

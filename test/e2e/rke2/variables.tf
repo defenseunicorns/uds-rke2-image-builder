@@ -1,7 +1,7 @@
 variable "name" {
   description = "Name for cluster"
   type        = string
-  default     = "dubbd-rke2-ci"
+  default     = "packer-rke2-ci"
 }
 
 variable "vpc_id" {
