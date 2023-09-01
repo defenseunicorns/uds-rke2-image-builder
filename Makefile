@@ -42,7 +42,7 @@ e2e-ubuntu: validate-ami-ubuntu publish-ami-ubuntu
 		-backend-config="dynamodb_table=uds-ci-state-dynamodb"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
 	kubectl get nodes; \
-	terraform destroy -auto-approve; \
+	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
 	snapshot_ids=$$(aws ec2 describe-images --image-ids "$${TEST_AMI_ID}" | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId); \
 	aws ec2 deregister-image --image-id $${TEST_AMI_ID}; \
 	for snapshot in $${snapshot_ids}; do \
