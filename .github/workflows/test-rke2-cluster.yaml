@@ -75,6 +75,7 @@ jobs:
     strategy:
       matrix:
         test-distros: [ubuntu, rhel]
+      fail-fast: false
 
     name: Test ${{ matrix.test-distros }} AMI
 
@@ -105,6 +106,7 @@ jobs:
       - name: Test ${{ matrix.test-distros }} AMI
         env:
           SHA: ${{ github.sha }}
+          DISTRO: ${{ matrix.test-distros }}
         run: make test-cluster
 
       - name: Teardown test infrastructure

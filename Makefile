@@ -76,7 +76,7 @@ test-cluster:
 	cd $(TEST_TF_DIR); \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-ci-state-bucket" \
-		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-rhel-rke2.tfstate" \
+		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-$${DISTRO}-rke2.tfstate" \
 		-backend-config="region=us-west-2" \
 		-backend-config="dynamodb_table=uds-ci-state-dynamodb"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
