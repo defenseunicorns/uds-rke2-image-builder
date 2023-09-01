@@ -72,6 +72,7 @@ e2e-rhel: validate-ami-rhel publish-ami-rhel test-cluster teardown-infra
 .PHONY: test-cluster
 test-cluster:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
+	echo "TEST AMI: $${TEST_AMI_ID}"; \
 	cd $(TEST_TF_DIR); \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-ci-state-bucket" \
@@ -84,6 +85,7 @@ test-cluster:
 .PHONY: teardown-infra
 teardown-infra:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
+	echo "TEST AMI: $${TEST_AMI_ID}"; \
 	cd $(TEST_TF_DIR); \
 	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
 	snapshot_ids=$$(aws ec2 describe-images --image-ids "$${TEST_AMI_ID}" | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId); \
