@@ -14,7 +14,7 @@ permissions:
   contents: read
       
 jobs:
-  test-ubuntu:
+  test-ubuntu-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -31,7 +31,7 @@ jobs:
         run: make validate-ami-ubuntu
       - name: Build Ubuntu AMI
         run: make build-ami-ubuntu
-  test-rhel:
+  test-rhel-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
