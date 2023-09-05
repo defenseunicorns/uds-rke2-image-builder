@@ -15,9 +15,9 @@ defaults:
     shell: bash -e -o pipefail {0}
 
 jobs:
-  Parse the command, so we can decide which tests to run.
-  Valid commands: "/test all", "/test ubuntu", "/test rhel"
-  We can do as many of these as we want to get as granular as we want.
+  # Parse the command, so we can decide which tests to run.
+  # Valid commands: "/test all", "/test ubuntu", "/test rhel"
+  # We can do as many of these as we want to get as granular as we want.
   parse:
     runs-on: ubuntu-latest
     outputs:
