@@ -1,0 +1,46 @@
+name: AWS AMI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "packer/aws/**"
+      - "packer/scripts/**"
+      - ".github/workflows/publish-aws.yaml"
+
+permissions:
+  id-token: write
+  contents: read
+      
+jobs:
+  publish-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_COMMERCIAL_ROLE_TO_ASSUME }}
+          role-session-name: ${{ github.job || github.event.client_payload.pull_request.head.sha || github.sha }}
+          aws-region: us-west-2
+          # 21600 seconds == 6 hours
+          role-duration-seconds: 21600
+      - name: Publish Ubuntu AMI
+        run: make publish-ami-ubuntu
+  publish-rhel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_COMMERCIAL_ROLE_TO_ASSUME }}
+          role-session-name: ${{ github.job || github.event.client_payload.pull_request.head.sha || github.sha }}
+          aws-region: us-west-2
+          # 21600 seconds == 6 hours
+          role-duration-seconds: 21600
+      - name: Publish RHEL AMI
+        run: make publish-ami-rhel

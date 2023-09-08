@@ -1,0 +1,50 @@
+name: AWS AMI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "packer/aws/**"
+      - "packer/scripts/**"
+      - ".github/workflows/on-pr-aws.yaml"
+
+permissions:
+  id-token: write
+  contents: read
+      
+jobs:
+  test-ubuntu-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_COMMERCIAL_ROLE_TO_ASSUME }}
+          role-session-name: ${{ github.job || github.event.client_payload.pull_request.head.sha || github.sha }}
+          aws-region: us-west-2
+          # 21600 seconds == 6 hours
+          role-duration-seconds: 21600
+      - name: Validate Ubuntu AMI
+        run: make validate-ami-ubuntu
+      - name: Build Ubuntu AMI
+        run: make build-ami-ubuntu
+  test-rhel-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_COMMERCIAL_ROLE_TO_ASSUME }}
+          role-session-name: ${{ github.job || github.event.client_payload.pull_request.head.sha || github.sha }}
+          aws-region: us-west-2
+          # 21600 seconds == 6 hours
+          role-duration-seconds: 21600
+      - name: Validate RHEL AMI
+        run: make validate-ami-rhel
+      - name: Build RHEL AMI
+        run: make build-ami-rhel
