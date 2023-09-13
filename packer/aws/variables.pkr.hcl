@@ -43,3 +43,9 @@ variable "base_ami_owners" {
   description = "List of owners to filter looking up the base ami"
   default     = ["amazon"]
 }
+
+variable "region" {
+  type        = string
+  description = "Region that AMI should be built in"
+  default     = "us-west-2"
+}

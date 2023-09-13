@@ -14,18 +14,18 @@ locals {
 }
 
 data "amazon-ami" "base-ami" {
-    filters = {
-        name = var.base_ami_name
-    }
-    owners = var.base_ami_owners
-    most_recent = true
+  filters = {
+    name = var.base_ami_name
+  }
+  owners      = var.base_ami_owners
+  most_recent = true
 }
 
 source "amazon-ebs" "base" {
   ami_name        = local.ami_name
   ami_description = "For UDS deployments on RKE2"
   instance_type   = "t2.micro"
-  region          = "us-west-2"
+  region          = var.region
   ssh_username    = var.ssh_username
   source_ami      = data.amazon-ami.base-ami.id
 
@@ -37,18 +37,18 @@ build {
   sources = ["source.amazon-ebs.base"]
 
   provisioner "shell" {
-    execute_command   = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
-    script            = "../scripts/install-deps.sh"
-    timeout           = "20m"
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    script          = "../scripts/install-deps.sh"
+    timeout         = "20m"
   }
-  
+
   provisioner "shell" {
     environment_vars = [
       "UBUNTU_PRO_TOKEN=${var.ubuntu_pro_token}"
     ]
     // STIG-ing must be run as root
     execute_command   = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
-    script            = "../scripts/stig.sh"
+    script            = "../scripts/os-stig.sh"
     expect_disconnect = length(var.ubuntu_pro_token) > 0
     timeout           = "20m"
   }
@@ -73,17 +73,37 @@ build {
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/aws-cli-install.sh"
-    timeout = "15m"
+    timeout         = "15m"
   }
 
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/cleanup-deps.sh"
-    timeout = "15m"
+    timeout         = "15m"
+  }
+
+  provisioner "file" {
+    source      = "../scripts/rke2-startup.sh"
+    destination = "/tmp/rke2-startup.sh"
+  }
+
+  provisioner "file" {
+    source      = "../stig-configs"
+    destination = "/tmp"
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "default_user=${var.ssh_username}"
+    ]
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    // Move files out of /tmp so they persist in created image
+    script          = "../scripts/move-files.sh"
+    timeout         = "15m"
   }
 
   post-processor "manifest" {
-        output = "manifest.json"
-    }
+    output = "manifest.json"
+  }
 
 }

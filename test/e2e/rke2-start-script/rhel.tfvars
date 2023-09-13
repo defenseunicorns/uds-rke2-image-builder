@@ -1,0 +1,1 @@
+default_user = "ec2-user"

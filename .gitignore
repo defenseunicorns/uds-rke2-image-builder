@@ -9,3 +9,7 @@ crash.log
 
 # Packer manifest
 manifest.json
+
+# Local .terraform files
+.terraform/
+.terraform.lock.hcl

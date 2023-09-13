@@ -116,15 +116,29 @@ jobs:
       - name: Publish ${{ matrix.test-distros }} AMI
         run: make publish-ami-${{ matrix.test-distros }}
 
-      - name: Test ${{ matrix.test-distros }} AMI
+      - name: RKE2 module test ${{ matrix.test-distros }} AMI
         env:
           SHA: ${{ github.sha }}
           DISTRO: ${{ matrix.test-distros }}
-        run: make test-cluster
+        run: make test-rke2-module
 
-      - name: Teardown test infrastructure
+      - name: Teardown rke2-module infrastructure
         if: always()
-        run: make teardown-infra
+        run: make teardown-test-rke2-module
+
+      - name: RKE2 startup script ${{ matrix.test-distros }} AMI
+        env:
+          SHA: ${{ github.sha }}
+          DISTRO: ${{ matrix.test-distros }}
+        run: make test-rke2-start-script
+
+      - name: Teardown rke2-startup-script infrastructure
+        if: always()
+        run: make teardown-test-rke2-start-script
+
+      - name: Cleanup ${{ matrix.test-distros }} AMI
+        if: always()
+        run: make cleanup-ami
 
       # Update GitHub status for successful pipeline run
       - name: "Update GitHub Status for success"

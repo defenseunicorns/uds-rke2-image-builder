@@ -7,6 +7,7 @@ usage() {
     echo "  -a               agent flag"
     echo "  -v               Verbose information about RKE2 installation"
     echo "  -d               Print Debug information"
+    echo "  -u               kube config user"
     echo "EXAMPLE Usage: "
     echo "  Server install: $0 -t 24dfa62bbe214bdf -s 10.10.0.1"
     echo "  Agent install:  $0 -t 24dfa62bbe214bdf -s 10.10.0.1j -a"
@@ -24,6 +25,8 @@ Script Parameters:
 '-s' RKE2 initializes on a single node. The '-s' argument is the IP address of this node in the cluster. RKE2 running on this node provides information during \"cluster up\" and node join operations. It does not have any impact on the cluster operation after initialization. i.e. RKE2 master nodes work together in an HA configuration.
 
 '-a' RKE2 has server or agent nodes. Agent nodes are Kubernetes worker nodes and do not host critical services like etcd or control-plane deployments.
+
+'-u' When server and node IP is the same, the kube config file gets saved under this user's home directory. When this is not set, the user running the script is used.
 
 Recommended Usage:
     Node0: \$0 -t <token> -s <node0_ip>
@@ -54,65 +57,137 @@ debug() {
     fi
 }
 
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
 if [ $# -eq 0 ]; then
     usage
 fi
 
 debug=0
 
-while getopts "t:s:avd" o; do
+while getopts "t:s:u:avd" o; do
     case "${o}" in
     t) token="${OPTARG}" ;;
     s) server_ip="${OPTARG}" ;;
     a) agent=1 ;;
     d) debug=1 ;;
+    u) user=${OPTARG} ;;
     v) verbose_docs ;;
     *) usage ;;
     esac
 done
 shift $(($OPTIND - 1))
 
-info "Installing RKE2"
+info "Starting RKE2 cluster"
+node_ip=$(ip route get $(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+') | grep -oP 'src \K\S+')
 
-node_ip=$(ip addr show eth0 | awk '/inet / {print $2}' | cut -d '/' -f1)
+if [ "$user" == "" ]; then
+    user=$USER
+fi
 
 debug "Token: $token"
 debug "Server IP: $server_ip"
 debug "Agent: $agent"
 debug "Node IP: $node_ip"
+debug "User: $user"
 
 info "Creating RKE2 Config file"
 config_dir=/etc/rancher/rke2
+config_subdir=/etc/rancher/rke2/config.yaml.d
 config_file=$config_dir/config.yaml
 mkdir -p $config_dir
+mkdir -p $config_subdir
 
 cat <<EOF >"$config_file"
+profile: "cis-1.23"
 disable:
   - rke2-ingress-nginx
   - rke2-metrics-server
-token: "$token"
 EOF
+
+stig_conf_dir=/home/$user/stig-configs
+if [ -f $stig_conf_dir/audit-policy.yaml ]; then
+    info "Copying audit-policy to destination"
+    cp $stig_conf_dir/audit-policy.yaml $config_dir/audit-policy.yaml
+fi
+if [ -f $stig_conf_dir/rke2-stig.yaml ]; then
+    info "Copying rke2 stig configuration to destination"
+    cp $stig_conf_dir/rke2-stig.yaml $config_subdir/00-rke2-stig.yaml
+fi
 
 if [ $server_ip != $node_ip ]; then
     debug "Updating Config file with Cluster Join Server IP"
-    echo "server: https://${server_ip}:9345" | sudo tee -a $config_dir/config.yaml >/dev/null
+    echo "server: https://${server_ip}:9345" | tee -a $config_file >/dev/null
 fi
-sudo INSTALL_RKE2_ARTIFACT_PATH=/root/rke2-artifacts/ sh /root/rke2-artifacts/install.sh
+if [ $token ]; then
+    debug "Updating Config file with Cluster Join token"
+    echo "token: ${token}" | tee -a $config_file >/dev/null
+fi
+
+# Start RKE2
 if [ -z $agent ]; then
     debug "Enabling systemd service for RKE2 Server"
-    sudo systemctl enable rke2-server.service
-    sudo systemctl start rke2-server.service
+    systemctl enable rke2-server.service
+    systemctl start rke2-server.service
 else
     debug "Enabling systemd service for RKE2 Agent"
-    sudo systemctl enable rke2-agent.service
-    sudo systemctl start rke2-agent.service
+    systemctl enable rke2-agent.service
+    systemctl start rke2-agent.service
 fi
 
 if [ $server_ip == $node_ip ]; then
+    # TODO variabalize user
     debug "Copying kubeconfig to user home directory"
-    mkdir /home/user/.kube
-    sudo cp /etc/rancher/rke2/rke2.yaml /home/user/.kube/config
-    sudo chown user:user /home/user/.kube/config
+    mkdir /home/$user/.kube
+    cp /etc/rancher/rke2/rke2.yaml /home/$user/.kube/config
+    chown -R $user:$user /home/$user/.kube
 fi
+
+# Ensure host permissions match STIG rules
+cd /etc/rancher/rke2
+chmod -R 0600 ./*
+chown -R root:root ./*
+ls -l
+
+cd /var/lib/rancher/rke2
+chown root:root ./*
+ls -l
+
+cd /var/lib/rancher/rke2/agent
+chown root:root ./*
+chmod 0700 pod-manifests
+chmod 0700 etc
+find . -maxdepth 1 -type f -name "*.kubeconfig" -exec chmod 0640 {} \;
+find . -maxdepth 1 -type f -name "*.crt" -exec chmod 0600 {} \;
+find . -maxdepth 1 -type f -name "*.key" -exec chmod 0600 {} \;
+ls -l
+
+cd /var/lib/rancher/rke2/agent/bin
+chown root:root ./*
+chmod 0750 ./*
+ls -l
+
+cd /var/lib/rancher/rke2/agent
+chown root:root data
+chmod 0750 data
+ls -l
+
+cd /var/lib/rancher/rke2/data
+chown root:root ./*
+chmod 0640 ./*
+ls -l
+
+cd /var/lib/rancher/rke2/server
+chown root:root ./*
+chmod 0700 cred
+chmod 0700 db
+chmod 0700 tls
+chmod 0751 manifests
+chmod 0750 logs
+chmod 0600 token
+ls -l
 
 info "RKE2 Installation Complete"
