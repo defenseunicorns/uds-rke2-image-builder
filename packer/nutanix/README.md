@@ -6,7 +6,7 @@ This folder contains the Packer code necessary to build STIG'd RKE2 disk images 
 
 You must have Prism Central setup for your cluster(s).
 
-You must already have your chosen base image(s) imported into Prism Central as a DISK image. Example locations to pull these from:
+You must already have your chosen base image(s) imported into Prism Central as a DISK image. You should be able to pull a "cloud image" from your OS provider, typically in a `.img` or `.qcow2` format. Common locations to pull these from:
 - [Ubuntu Cloud Images](https://cloud-images.ubuntu.com/focal/)
 - [RHEL Cloud Image Builder](https://console.redhat.com/insights/image-builder) will build a "Virtualization - Guest image (.qcow2)" with your license attached. Ensure that Ansible automation platform repository is added to your [activation key](https://console.redhat.com/insights/connector/activation-keys) (ex: `ansible-automation-platform-2.4-for-rhel-8-x86_64-rpms`).
 
@@ -19,7 +19,6 @@ To build on a Nutanix cluster you need to setup variables to point to your clust
 - `nutanix_cluster`: Name of cluster to use for Packer build VM
 - `nutanix_subnet`: Name of subnet in cluster to use for Packer build VM
 - `image_delete`: Build, but delete the final image rather than saving on Prism Central
-- `image_export`: Export raw image in the current folder
 - `output_image_name`: Name of the output image, will have a timestamp appended
 - `base_image_name`: Name of your base image in Prism Central
 
@@ -27,7 +26,7 @@ There are additional variables available as well that you may want to use in som
 
 ## Building the Image
 
-Assuming you have setup your variables in a `.auto.pkrvars.hcl` file, you should be able to use the below `make` targets for building the image:
+Assuming you have setup your variables in a `.auto.pkrvars.hcl` file, you should be able to use the below `make` targets for building the image and publishing to your active Nutanix environment:
 
 ```console
 # Build the image using your variables file
