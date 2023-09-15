@@ -44,9 +44,9 @@ source "nutanix" "base" {
 
   // Startup / Connection / Shutdown Details
   user_data        = base64encode(file("cloud-config.yaml"))
-  ssh_password     = "packer"
-  ssh_username     = "builder"
-  shutdown_command = "echo 'packer' | sudo -S shutdown -P now"
+  ssh_username     = "packer"
+  ssh_password     = "builder"
+  shutdown_command = "sudo su root -c \"userdel -rf packer; rm /etc/sudoers.d/90-cloud-init-users; /sbin/shutdown -hP now\""
   shutdown_timeout = "2m"
 }
 

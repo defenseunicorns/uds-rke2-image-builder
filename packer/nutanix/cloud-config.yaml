@@ -1,9 +1,9 @@
 #cloud-config
 users:
-  - name: builder
+  - name: packer
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
 chpasswd:
   list: |
-    builder:packer
+    packer:builder
   expire: False
 ssh_pwauth: True
