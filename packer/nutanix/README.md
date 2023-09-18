@@ -38,4 +38,6 @@ make build-nutanix
 
 ## Using the Image
 
-Once your image is built and "published" you can spin up a VM using it. Attach a disk, set to clone from the image you created, and resize it accordingly to your needs for the root disk. You will also need to use cloud-init to setup an initial user. An example of this is used for the Packer build to create a user `builder` with the password `packer` and sudo privileges (check it out [here](./cloud-config.yaml)).
+Once your image is built and "published" you can spin up a VM using it. Attach a disk, set to clone from the image you created, and resize it accordingly to your needs for the root disk. You will also likely want to use cloud-init for a few things:
+- Setup an initial user (no default user exists in these built images): See [here](./cloud-config.yaml) for a basic example adding a user `packer` with the password `builder`.
+- Set a unique hostname (default will likely be `ubuntu` on Ubuntu and `localhost` on RHEL): See [here](https://cloudinit.readthedocs.io/en/latest/reference/modules.html#set-hostname) for example formatting to add to your cloud-init.
