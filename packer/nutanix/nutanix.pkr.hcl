@@ -93,4 +93,10 @@ build {
     script          = "../scripts/cleanup-deps.sh"
     timeout         = "15m"
   }
+
+  provisioner "shell" {
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    script          = "../scripts/cleanup-cloud-init.sh"
+    timeout         = "15m"
+  }
 }
