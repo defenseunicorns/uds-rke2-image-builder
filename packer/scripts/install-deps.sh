@@ -5,6 +5,7 @@
 DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
 
 if [[ $DISTRO == "rhel" ]]; then
+    yum update -y && yum upgrade -y
     yum install ansible unzip iptables nftables -y
 elif [[ $DISTRO == "ubuntu" ]]; then
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -14,3 +15,7 @@ elif [[ $DISTRO == "ubuntu" ]]; then
 else
     echo "$DISTRO not an expected distribution."
 fi
+
+# Ensure that ansible collections needed are installed 
+ansible-galaxy collection install community.general
+ansible-galaxy collection install ansible.posix    

@@ -9,3 +9,6 @@ crash.log
 
 # Packer manifest
 manifest.json
+
+# Packer auto vars
+*.auto.pkrvars.hcl
