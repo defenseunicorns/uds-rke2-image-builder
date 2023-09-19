@@ -2,6 +2,7 @@ SHELL := /bin/bash
 
 # Dirpaths for flavors
 AWS_DIR := packer/aws
+NUTANIX_DIR := packer/nutanix
 
 E2E_TEST_DIR := test/e2e
 
@@ -19,8 +20,10 @@ help: ## Show this help message.
 # Packer Targets
 ######################
 
+# AWS
+
 .PHONY: publish-ami-ubuntu
-publish-ami-ubuntu: ## Build and Publish the AMI for AWS.
+publish-ami-ubuntu: ## Build and Publish the Ubuntu AMI for AWS.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer build -var "ubuntu_pro_token=$(ubuntu_pro_token)" --var-file=ubuntu.pkrvars.hcl .
 
@@ -30,7 +33,7 @@ publish-ami-rhel: ## Build and Publish the RHEL AMI for AWS.
 	@cd $(AWS_DIR) && packer build --var-file=rhel.pkrvars.hcl .
 
 .PHONY: build-ami-ubuntu
-build-ami-ubuntu: ## Build the AMI for AWS.
+build-ami-ubuntu: ## Build the Ubuntu AMI for AWS.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=$(ubuntu_pro_token)" --var-file=ubuntu.pkrvars.hcl .
 
@@ -40,11 +43,11 @@ build-ami-rhel: ## Build the RHEL AMI for AWS.
 	@cd $(AWS_DIR) && packer build -var "skip_create_ami=true" --var-file=rhel.pkrvars.hcl .
 
 .PHONY: fmt-ami
-fmt-ami: ## Run packer fmt for the AWS AMI.
+fmt-ami: ## Run packer fmt for the AWS Ubuntu AMI.
 	@cd $(AWS_DIR) && packer fmt .
 
 .PHONY: validate-ami-ubuntu
-validate-ami-ubuntu: ## Run packer validation for the AWS AMI.
+validate-ami-ubuntu: ## Run packer validation for the AWS Ubuntu AMI.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer validate --var-file=ubuntu.pkrvars.hcl .
 
@@ -53,15 +56,37 @@ validate-ami-rhel: ## Run packer validation for the AWS RHEL AMI.
 	@cd $(AWS_DIR) && packer init .
 	@cd $(AWS_DIR) && packer validate --var-file=rhel.pkrvars.hcl .
 
+# Nutanix
+
+.PHONY: publish-nutanix
+publish-nutanix: ## Build and Publish the Nutanix Image.
+	@cd $(NUTANIX_DIR) && packer init .
+	@cd $(NUTANIX_DIR) && packer build -var "ubuntu_pro_token=$(ubuntu_pro_token)" .
+
+.PHONY: build-nutanix
+build-nutanix: ## Build the Nutanix Image.
+	@cd $(NUTANIX_DIR) && packer init .
+	@cd $(NUTANIX_DIR) && packer build -var "image_delete=true" -var "ubuntu_pro_token=$(ubuntu_pro_token)" .
+
+.PHONY: fmt-nutanix
+fmt-nutanix: ## Run packer fmt for the Nutanix Image.
+	@cd $(NUTANIX_DIR) && packer fmt .
+
+.PHONY: validate-nutanix
+validate-nutanix: ## Run packer validation for the Nutanix Image.
+	@cd $(NUTANIX_DIR) && packer init .
+	@cd $(NUTANIX_DIR) && packer validate .
+
+
 ######################
 # Test Targets
 ######################
 
 .PHONY: test-ami-ubuntu
-test-ami-ubuntu: fmt-ami validate-ami-ubuntu build-ami-ubuntu ## fmt, validate, and build the AMI for AWS.
+test-ami-ubuntu: fmt-ami validate-ami-ubuntu build-ami-ubuntu ## fmt, validate, and build the Ubuntu AMI for AWS.
 
 .PHONY: test-ami-rhel
-test-ami-rhel: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and build the AMI for AWS.
+test-ami-rhel: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and build the RHEL AMI for AWS.
 
 .PHONY: e2e-ubuntu
 e2e-ubuntu: validate-ami-ubuntu publish-ami-ubuntu test-rke2-module teardown-rke2-module cleanup-ami

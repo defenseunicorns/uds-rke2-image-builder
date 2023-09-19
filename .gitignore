@@ -16,3 +16,5 @@ manifest.json
 
 # Auto tfvars used for local testing
 *.auto.tfvars
+# Packer auto vars
+*.auto.pkrvars.hcl

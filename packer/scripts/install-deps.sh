@@ -5,6 +5,7 @@
 DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
 
 if [[ $DISTRO == "rhel" ]]; then
+    yum update -y && yum upgrade -y
     yum install ansible unzip iptables nftables -y
 elif [[ $DISTRO == "ubuntu" ]]; then
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -18,3 +19,6 @@ fi
 # Install kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+# Ensure that ansible collections needed are installed 
+ansible-galaxy collection install community.general
+ansible-galaxy collection install ansible.posix    
