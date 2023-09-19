@@ -5,6 +5,7 @@ AWS_DIR := packer/aws
 NUTANIX_DIR := packer/nutanix
 
 E2E_TEST_DIR := test/e2e
+UTIL_SCRIPTS_DIR := utils/scripts
 
 ######################
 # Make Targets
@@ -99,12 +100,15 @@ e2e-rhel: validate-ami-rhel publish-ami-rhel test-rke2-module teardown-rke2-modu
 test-cluster:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
+	ROOT_DIR=$$(pwd); \
 	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-ci-state-bucket" \
 		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
-	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars” -auto-approve
+	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars” -auto-approve; \
+	$${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
+	kubectl get nodes
 
 .PHONY: teardown-infra
 teardown-infra:
@@ -112,12 +116,6 @@ teardown-infra:
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
 	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars” -auto-approve
-
-# Grab generated SSH key from terraform outputs
-.PHONY: get-ssh-key
-get-ssh-key:
-	cd $(E2E_TEST_DIR)/rke2-cluster; \
-	terraform output -raw private_key
 
 .PHONY: cleanup-ami
 cleanup-ami:
@@ -153,12 +151,21 @@ validate-rke2-terraform--dev:
 test-cluster-dev:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
+	ROOT_DIR=$$(pwd); \
 	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-dev-state-bucket" \
 		-backend-config="key=tfstate/$$(openssl rand -hex 3)-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
-	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var="vpc_name=rke2-dev" -var="subnet_name=rke2-dev-public*" -var-file="$(DISTRO).tfvars" -auto-approve
+	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var="vpc_name=rke2-dev" -var="subnet_name=rke2-dev-public*" -var-file="$(DISTRO).tfvars" -auto-approve; \
+	$${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
+	kubectl get nodes
+
+# Grab generated SSH key from terraform outputs
+.PHONY: get-ssh-key
+get-ssh-key:
+	cd $(E2E_TEST_DIR)/rke2-cluster; \
+	terraform output -raw private_key
 
 .PHONY: teardown-infra-dev
 teardown-infra-dev:

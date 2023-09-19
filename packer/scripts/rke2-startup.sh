@@ -3,6 +3,7 @@
 usage() {
     echo "Usage: Utility script for installing a RKE2 cluster"
     echo "  -t  [string_val] cluster join token"
+    echo "  -T  [string_val] space delimited list of TLS SANs to add to node certificate"
     echo "  -s  [string_val] cluster server join ip (Ex. 10.0.0.1)"
     echo "  -a               agent flag"
     echo "  -v               Verbose information about RKE2 installation"
@@ -11,6 +12,7 @@ usage() {
     echo "EXAMPLE Usage: "
     echo "  Server install: $0 -t 24dfa62bbe214bdf -s 10.10.0.1"
     echo "  Agent install:  $0 -t 24dfa62bbe214bdf -s 10.10.0.1j -a"
+    echo "  Server install with SANS:  $0 -t 24dfa62bbe214bdf -T \"awesome.hostname.com 10.10.10.10\" -s 10.10.0.1j"
     exit 1
 }
 
@@ -27,6 +29,8 @@ Script Parameters:
 '-a' RKE2 has server or agent nodes. Agent nodes are Kubernetes worker nodes and do not host critical services like etcd or control-plane deployments.
 
 '-u' When server and node IP is the same, the kube config file gets saved under this user's home directory. When this is not set, the user running the script is used.
+
+'-T' By default cluster generated certificate is only valid for the loopback address and private IPs it can find on interfaces. When accessing cluster from a hostname or public IP, they need to be provided so they can be added to the cluster certificate.
 
 Recommended Usage:
     Node0: \$0 -t <token> -s <node0_ip>
@@ -68,9 +72,10 @@ fi
 
 debug=0
 
-while getopts "t:s:u:avd" o; do
+while getopts "t:T:s:u:avd" o; do
     case "${o}" in
     t) token="${OPTARG}" ;;
+    T) tls_sans="${OPTARG}" ;;
     s) server_ip="${OPTARG}" ;;
     a) agent=1 ;;
     d) debug=1 ;;
@@ -93,6 +98,7 @@ debug "Server IP: $server_ip"
 debug "Agent: $agent"
 debug "Node IP: $node_ip"
 debug "User: $user"
+debug "TLS SANS: $tls_sans"
 
 info "Creating RKE2 Config file"
 config_dir=/etc/rancher/rke2
@@ -125,6 +131,14 @@ fi
 if [ $token ]; then
     debug "Updating Config file with Cluster Join token"
     echo "token: ${token}" | tee -a $config_file >/dev/null
+fi
+if [ "${tls_sans}" ]; then
+    debug "Updating Config file with TLS SANs"
+    echo "tls-san:" | tee -a $config_file >/dev/null
+    for san in $tls_sans
+    do
+        echo "  - \"${san}\"" | tee -a $config_file >/dev/null
+    done
 fi
 
 # Start RKE2

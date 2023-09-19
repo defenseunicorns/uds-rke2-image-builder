@@ -34,6 +34,18 @@ variable "allowed_in_cidrs" {
   default     = []
 }
 
+variable "cluster_sans" {
+  type        = list(string)
+  description = "Optional list of TLS SANs for RKE2 to include on cluster cert. Should include any public IPs and/or hostnames used to connect to the kubernetes API. cluster.foo.bar default used by CI tests"
+  default     = []
+}
+
+variable "cluster_hostname" {
+  type        = string
+  description = "Hostname to use for connecting to cluster API. Gets merged with cluster_sans list var. cluster.foo.bar default used by CI tests"
+  default     = "cluster.foo.bar"
+}
+
 variable "ami_id" {
   type        = string
   description = "AMI to use for deployment, must have RKE2 pre-installed"

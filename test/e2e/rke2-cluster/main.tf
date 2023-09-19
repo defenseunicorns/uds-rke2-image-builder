@@ -44,7 +44,7 @@ resource "aws_instance" "test_bootstrap_node" {
   ami           = var.ami_id
   instance_type = "m5.2xlarge"
   key_name      = aws_key_pair.example_key_pair.key_name
-  user_data     = templatefile("${path.module}/scripts/user_data.sh", { BOOTSTRAP_IP = "", AGENT_NODE = false, RKE2_JOIN_TOKEN = random_password.rke2_join_token.result, DEFAULT_USER = var.default_user })
+  user_data     = templatefile("${path.module}/scripts/user_data.sh", { BOOTSTRAP_IP = "", AGENT_NODE = false, RKE2_JOIN_TOKEN = random_password.rke2_join_token.result, DEFAULT_USER = var.default_user, CLUSTER_SANS = join(" ", concat(var.cluster_sans, [var.cluster_hostname])) })
   subnet_id     = data.aws_subnet.test_subnet.id
   user_data_replace_on_change = true
 
@@ -66,7 +66,7 @@ resource "aws_instance" "test_control_plane_node" {
   ami           = var.ami_id
   instance_type = "m5.2xlarge"
   key_name      = aws_key_pair.example_key_pair.key_name
-  user_data     = templatefile("${path.module}/scripts/user_data.sh", { BOOTSTRAP_IP = aws_instance.test_bootstrap_node.private_ip, AGENT_NODE = false, RKE2_JOIN_TOKEN = random_password.rke2_join_token.result, DEFAULT_USER = var.default_user })
+  user_data     = templatefile("${path.module}/scripts/user_data.sh", { BOOTSTRAP_IP = aws_instance.test_bootstrap_node.private_ip, AGENT_NODE = false, RKE2_JOIN_TOKEN = random_password.rke2_join_token.result, DEFAULT_USER = var.default_user, CLUSTER_SANS = join(" ", concat(var.cluster_sans, [var.cluster_hostname])) })
   subnet_id     = data.aws_subnet.test_subnet.id
   user_data_replace_on_change = true
 
@@ -88,7 +88,7 @@ resource "aws_instance" "test_agent_node" {
   ami           = var.ami_id
   instance_type = "m5.2xlarge"
   key_name      = aws_key_pair.example_key_pair.key_name
-  user_data     = templatefile("${path.module}/scripts/user_data.sh", { BOOTSTRAP_IP = aws_instance.test_bootstrap_node.private_ip, AGENT_NODE = true, RKE2_JOIN_TOKEN = random_password.rke2_join_token.result, DEFAULT_USER = var.default_user })
+  user_data     = templatefile("${path.module}/scripts/user_data.sh", { BOOTSTRAP_IP = aws_instance.test_bootstrap_node.private_ip, AGENT_NODE = true, RKE2_JOIN_TOKEN = random_password.rke2_join_token.result, DEFAULT_USER = var.default_user, CLUSTER_SANS = join(" ", concat(var.cluster_sans, [var.cluster_hostname])) })
   subnet_id     = data.aws_subnet.test_subnet.id
   user_data_replace_on_change = true
 

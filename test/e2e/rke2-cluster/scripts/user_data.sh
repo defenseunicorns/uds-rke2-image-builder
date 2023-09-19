@@ -7,10 +7,15 @@ else
     bootstrap_ip=${BOOTSTRAP_IP}
 fi
 
+if [[ "${CLUSTER_SANS}" ]]; then
+    echo "Passing SANs to RKE2 startup script: ${CLUSTER_SANS}"
+    san_options="-T ${CLUSTER_SANS}"
+fi
+
 echo "Bootstrap node IP: $${bootstrap_ip}"
 
 if [[ "${AGENT_NODE}" == "true" ]]; then
-    ./home/${DEFAULT_USER}/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} -s $${bootstrap_ip} -u ${DEFAULT_USER} -a
+    ./home/${DEFAULT_USER}/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} $${san_options} -s $${bootstrap_ip} -u ${DEFAULT_USER} -a
 else
-    ./home/${DEFAULT_USER}/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} -s $${bootstrap_ip} -u ${DEFAULT_USER}
+    ./home/${DEFAULT_USER}/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} $${san_options} -s $${bootstrap_ip} -u ${DEFAULT_USER}
 fi
