@@ -94,50 +94,29 @@ e2e-ubuntu: validate-ami-ubuntu publish-ami-ubuntu test-rke2-module teardown-rke
 .PHONY: e2e-rhel
 e2e-rhel: validate-ami-rhel publish-ami-rhel test-rke2-module teardown-rke2-module cleanup-ami
 
-# Test AMI with Rancher AWS Terraform module
-.PHONY: test-rke2-module
-test-rke2-module:
-	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
-	echo "TEST AMI: $${TEST_AMI_ID}"; \
-	cd $(E2E_TEST_DIR)/rke2-module; \
-	terraform init -force-copy \
-		-backend-config="bucket=uds-ci-state-bucket" \
-		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-$(DISTRO)-rke2-module.tfstate" \
-		-backend-config="region=us-west-2" \
-		-backend-config="dynamodb_table=uds-ci-state-dynamodb"; \
-	terraform apply -var="ami_id=$${TEST_AMI_ID}" -auto-approve; \
-	kubectl get nodes
-
-.PHONY: teardown-rke2-module
-teardown-rke2-module:
-	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
-	echo "TEST AMI: $${TEST_AMI_ID}"; \
-	cd $(E2E_TEST_DIR)/rke2-module; \
-	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -auto-approve
-
 # Test AMI with baked in RKE2 startup script
-.PHONY: test-rke2-start-script
-test-rke2-start-script:
+.PHONY: test-cluster
+test-cluster:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
-	cd $(E2E_TEST_DIR)/rke2-start-script; \
+	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-ci-state-bucket" \
 		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars” -auto-approve
 
-.PHONY: teardown-rke2-start-script
-teardown-rke2-start-script:
+.PHONY: teardown-infra
+teardown-infra:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
-	cd $(E2E_TEST_DIR)/rke2-start-script; \
+	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars” -auto-approve
 
 # Grab generated SSH key from terraform outputs
 .PHONY: get-ssh-key
 get-ssh-key:
-	cd $(E2E_TEST_DIR)/rke2-start-script; \
+	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform output -raw private_key
 
 .PHONY: cleanup-ami
@@ -159,31 +138,31 @@ cleanup-ami:
 ######################
 
 # Test AMI with baked in RKE2 startup script in dev account
-.PHONY: validate-rke2-start-script-dev
-validate-rke2-start-script-dev:
+.PHONY: validate-rke2-terraform-dev
+validate-rke2-terraform--dev:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
-	cd $(E2E_TEST_DIR)/rke2-start-script; \
+	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-dev-state-bucket" \
 		-backend-config="key=tfstate/$$(openssl rand -hex 3)-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
 	terraform validate
 
-.PHONY: test-rke2-start-script-dev
-test-rke2-start-script-dev:
+.PHONY: test-cluster-dev
+test-cluster-dev:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
-	cd $(E2E_TEST_DIR)/rke2-start-script; \
+	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform init -force-copy \
 		-backend-config="bucket=uds-dev-state-bucket" \
 		-backend-config="key=tfstate/$$(openssl rand -hex 3)-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var="vpc_name=rke2-dev" -var="subnet_name=rke2-dev-public*" -var-file="$(DISTRO).tfvars" -auto-approve
 
-.PHONY: teardown-rke2-start-script-dev
-teardown-rke2-start-script-dev:
+.PHONY: teardown-infra-dev
+teardown-infra-dev:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
-	cd $(E2E_TEST_DIR)/rke2-start-script; \
+	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -var="vpc_name=rke2-dev" -var="subnet_name=rke2-dev-public*" -var-file="$(DISTRO).tfvars" -auto-approve
