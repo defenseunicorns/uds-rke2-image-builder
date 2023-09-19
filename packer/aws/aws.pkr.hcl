@@ -19,6 +19,7 @@ data "amazon-ami" "base-ami" {
   }
   owners      = var.base_ami_owners
   most_recent = true
+  region      = var.region
 }
 
 source "amazon-ebs" "base" {

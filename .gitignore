@@ -13,3 +13,6 @@ manifest.json
 # Local .terraform files
 .terraform/
 .terraform.lock.hcl
+
+# Auto tfvars used for local testing
+*.auto.tfvars

@@ -1,12 +1,13 @@
-variable "vpc_id" {
+variable "vpc_name" {
   type        = string
   description = "VPC ID to deploy into"
-  default     = "vpc-0007fc0c033f08824"
+  default     = "uds-ci-commercial-842d"
 }
 
-variable "ami_id" {
+variable "subnet_name" {
   type        = string
-  description = "AMI to use for deployment, must have RKE2 pre-installed"
+  description = "Name of subnet to use for testing. Can use a wildcard as long as it only matches one subnet per az."
+  default     = "uds-ci-commercial-842d-public*"
 }
 
 variable "region" {
@@ -15,25 +16,40 @@ variable "region" {
   default     = "us-west-2"
 }
 
-variable "ssh_key_name" {
-  type        = string
-  description = "Name of the SSH key to attach to the EC2"
-  default     = null
+variable "control_plane_node_count" {
+  type        = number
+  description = "How many control plane nodes to spin up"
+  default     = 1
 }
 
-variable "bootstrap_ip" {
-  type        = string
-  description = "IP address of RKE2 bootstrap node"
-  default     = ""
+variable "agent_node_count" {
+  type        = number
+  description = "How many agent nodes to spin up"
+  default     = 0
 }
 
-variable "agent_node" {
-  type        = bool
-  description = "Should RKE2 start as agent"
-  default     = false
+variable "allowed_in_cidrs" {
+  type        = list(string)
+  description = "Optional list of CIDRs that can connect to the cluster in addition to CIDR of VPC cluster is deployed to"
+  default     = []
+}
+
+variable "ami_id" {
+  type        = string
+  description = "AMI to use for deployment, must have RKE2 pre-installed"
+}
+
+variable "os_distro" {
+  type        = string
+  description = "OS distribution used to distinguish test infra based on which test created it"
 }
 
 variable "default_user" {
   type        = string
   description = "Default user of AMI"
+}
+
+variable "ssh_key_name" {
+  type        = string
+  description = "What to name generated SSH key pair in AWS"
 }

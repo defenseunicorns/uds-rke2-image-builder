@@ -120,21 +120,20 @@ jobs:
         env:
           SHA: ${{ github.sha }}
           DISTRO: ${{ matrix.test-distros }}
-        run: make test-rke2-module
+        run: make test-rke2-module DISTRO="${{ matrix.test-distros }}"
 
       - name: Teardown rke2-module infrastructure
         if: always()
-        run: make teardown-test-rke2-module
+        run: make teardown-test-rke2-module DISTRO="${{ matrix.test-distros }}"
 
       - name: RKE2 startup script ${{ matrix.test-distros }} AMI
         env:
           SHA: ${{ github.sha }}
-          DISTRO: ${{ matrix.test-distros }}
-        run: make test-rke2-start-script
+        run: make test-rke2-start-script DISTRO="${{ matrix.test-distros }}"
 
       - name: Teardown rke2-startup-script infrastructure
         if: always()
-        run: make teardown-test-rke2-start-script
+        run: make teardown-test-rke2-start-script DISTRO="${{ matrix.test-distros }}"
 
       - name: Cleanup ${{ matrix.test-distros }} AMI
         if: always()

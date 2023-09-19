@@ -138,15 +138,14 @@ else
     systemctl start rke2-agent.service
 fi
 
-if [ $server_ip == $node_ip ]; then
-    # TODO variabalize user
-    debug "Copying kubeconfig to user home directory"
-    mkdir /home/$user/.kube
-    cp /etc/rancher/rke2/rke2.yaml /home/$user/.kube/config
-    chown -R $user:$user /home/$user/.kube
-fi
+# Copy kubeconfig to default user home directory
+debug "Copying kubeconfig to user home directory"
+mkdir /home/$user/.kube
+cp /etc/rancher/rke2/rke2.yaml /home/$user/.kube/config
+chown -R $user:$user /home/$user/.kube
 
 # Ensure host permissions match STIG rules
+info "Updating file permissions for STIG rules"
 cd /etc/rancher/rke2
 chmod -R 0600 ./*
 chown -R root:root ./*
