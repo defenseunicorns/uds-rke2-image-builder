@@ -12,10 +12,11 @@ cluster_hostname=$(terraform output -raw cluster_hostname)
 # Wait on cloud-init to finish running on cluster node
 ssh -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip} "cloud-init status --wait"
 # Copy kubectl from cluster node
-scp -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip}:/home/${node_user}/.kube/config ~/.kube/config
+scp -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip}:/home/${node_user}/.kube/config ~/.kube/rke2-config
 
 # Replace the loopback address with the cluster hostname
-sed -i "s/127.0.0.1/${cluster_hostname}/g" ~/.kube/config
+sed -i "s/127.0.0.1/${cluster_hostname}/g" ~/.kube/rke2-config
+export KUBECONFIG=~/.kube/rke2-config
 
 # find existing host record in the host file and save the line numbers
 matches_in_hosts="$(grep -n $cluster_hostname /etc/hosts | cut -f1 -d:)"
