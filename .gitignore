@@ -18,3 +18,6 @@ manifest.json
 *.auto.tfvars
 # Packer auto vars
 *.auto.pkrvars.hcl
+
+# SSH private keys
+*.pem
