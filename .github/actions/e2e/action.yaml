@@ -10,6 +10,11 @@ inputs:
     description: Distro of the AMI being tested
     required: true
 
+defaults:
+  run:
+    # We need -e -o pipefail for consistency with GitHub Actions' default behavior
+    shell: bash -e -o pipefail {0}
+
 runs:
   using: composite
   steps:
