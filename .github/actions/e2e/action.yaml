@@ -10,11 +10,6 @@ inputs:
     description: Distro of the AMI being tested
     required: true
 
-defaults:
-  run:
-    # We need -e -o pipefail for consistency with GitHub Actions' default behavior
-    shell: bash -e -o pipefail {0}
-
 runs:
   using: composite
   steps:
@@ -34,22 +29,27 @@ runs:
         GITHUB_OWNER: ${{ github.event.client_payload.github.payload.repository.owner.login || github.repository_owner }}
 
     - name: Validate ${{ inputs.distro }} AMI
+      shell: bash -e -o pipefail {0}
       run: make validate-ami-${{ inputs.distro }}
 
     - name: Publish ${{ inputs.distro }} AMI
+      shell: bash -e -o pipefail {0}
       run: make publish-ami-${{ inputs.distro }}
 
     - name: Test ${{ inputs.distro }} AMI
+      shell: bash -e -o pipefail {0}
       env:
         SHA: ${{ github.sha }}
         DISTRO: ${{ inputs.distro }}
       run: make test-cluster DISTRO="${{ inputs.distro }}"
 
     - name: Teardown test infrastructure
+      shell: bash -e -o pipefail {0}
       if: always()
       run: make teardown-infra DISTRO="${{ inputs.distro }}"
 
     - name: Cleanup ${{ inputs.distro }} AMI
+      shell: bash -e -o pipefail {0}
       if: always()
       run: make cleanup-ami
 
