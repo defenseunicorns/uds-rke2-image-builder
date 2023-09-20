@@ -15,6 +15,10 @@ for i in $(seq 1 10); do
     ssh -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip} "cloud-init status --wait" && break
     sleep 15
 done
+
+# Make sure .kube directory exists
+mkdir -p ~/.kube
+
 # Copy kubectl from cluster node
 scp -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip}:/home/${node_user}/.kube/config ~/.kube/rke2-config
 
