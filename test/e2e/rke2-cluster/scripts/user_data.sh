@@ -15,7 +15,7 @@ fi
 echo "Bootstrap node IP: $${bootstrap_ip}"
 
 if [[ "${AGENT_NODE}" == "true" ]]; then
-    ./home/${DEFAULT_USER}/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} $${san_options} -s $${bootstrap_ip} -u ${DEFAULT_USER} -a
+    ./root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} $${san_options} -s $${bootstrap_ip} -u ${DEFAULT_USER} -a
 else
-    ./home/${DEFAULT_USER}/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} $${san_options} -s $${bootstrap_ip} -u ${DEFAULT_USER}
+    ./root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} $${san_options} -s $${bootstrap_ip} -u ${DEFAULT_USER}
 fi
