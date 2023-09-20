@@ -11,8 +11,8 @@ usage() {
     echo "  -u               kube config user"
     echo "EXAMPLE Usage: "
     echo "  Server install with user set: $0 -t 24dfa62bbe214bdf -s 10.10.0.1 -u ubuntu"
-    echo "  Agent install:  $0 -t 24dfa62bbe214bdf -s 10.10.0.1j -a"
-    echo "  Server install with SANS:  $0 -t 24dfa62bbe214bdf -T \"awesome.hostname.com 10.10.10.10\" -s 10.10.0.1j"
+    echo "  Agent install:  $0 -t 24dfa62bbe214bdf -s 10.10.0.1 -a"
+    echo "  Server install with SANS:  $0 -t 24dfa62bbe214bdf -T \"awesome.hostname.com 10.10.10.10\" -s 10.10.0.1"
     exit 1
 }
 
