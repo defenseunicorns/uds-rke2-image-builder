@@ -23,3 +23,7 @@ Examples and info for each:
 `make teardown-infra-dev DISTRO="ubuntu"` - DISTRO should be set to match distro of AMI being used (currently should be either `rhel` or `ubuntu`). Destroys all infrastructure deployed by test-cluster-dev target.
 
 `make cleanup-ami` - Unregister AMI and cleanup snapshots associated with it
+
+`make full-up DISTRO="ubuntu"` - DISTRO should be set to match distro of AMI being used (currently should be either `rhel` or `ubuntu`). Runs both the publish-ami and test-cluster-dev make targets
+
+`make full-down DISTRO="ubuntu"` - DISTRO should be set to match distro of AMI being used (currently should be either `rhel` or `ubuntu`). Runs both the teardown-infra-dev and cleanup-ami make targets

@@ -89,12 +89,6 @@ test-ami-ubuntu: fmt-ami validate-ami-ubuntu build-ami-ubuntu ## fmt, validate, 
 .PHONY: test-ami-rhel
 test-ami-rhel: fmt-ami validate-ami-rhel build-ami-rhel ## fmt, validate, and build the RHEL AMI for AWS.
 
-.PHONY: e2e-ubuntu
-e2e-ubuntu: validate-ami-ubuntu publish-ami-ubuntu test-rke2-module teardown-rke2-module cleanup-ami
-
-.PHONY: e2e-rhel
-e2e-rhel: validate-ami-rhel publish-ami-rhel test-rke2-module teardown-rke2-module cleanup-ami
-
 # Test AMI with baked in RKE2 startup script
 .PHONY: test-cluster
 test-cluster:
@@ -134,6 +128,12 @@ cleanup-ami: ## Cleans up snapshots and AMI previously published
 ######################
 # Local testing in dev account
 ######################
+
+.PHONY: full-up
+full-up: validate-ami-$(DISTRO) publish-ami-$(DISTRO) test-cluster-dev ## Publishes AMI for distro and then deploys with it. Requires setting DISTRO="distro" to use correct .tfvars
+
+.PHONY: full-down
+full-down: teardown-infra-dev cleanup-ami ## Tears down test infrastructure and removes AMI. Requires setting DISTRO="distro" to use correct .tfvars
 
 # Test AMI with baked in RKE2 startup script in dev account
 .PHONY: validate-rke2-terraform-dev
