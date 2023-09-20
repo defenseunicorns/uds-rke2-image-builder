@@ -16,6 +16,18 @@ variable "region" {
   default     = "us-west-2"
 }
 
+variable "agent_instance_type" {
+  type        = string
+  description = "Instance type to use for agent nodes. Defaults to c5.xlarge to match RKE2 recommended specs."
+  default     = "c5.xlarge"
+}
+
+variable "control_plane_instance_type" {
+  type        = string
+  description = "Instance type to use for control plane nodes. Defaults to c5.xlarge to match RKE2 recommended specs."
+  default     = "c5.xlarge"
+}
+
 variable "control_plane_node_count" {
   type        = number
   description = "How many control plane nodes to spin up. Total control plane nodes will be n+1 due to bootstrap node. For HA, there should be an odd number of control plane nodes."
