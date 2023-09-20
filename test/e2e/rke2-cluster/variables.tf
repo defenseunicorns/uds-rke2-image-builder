@@ -18,8 +18,8 @@ variable "region" {
 
 variable "control_plane_node_count" {
   type        = number
-  description = "How many control plane nodes to spin up"
-  default     = 1
+  description = "How many control plane nodes to spin up. Total control plane nodes will be n+1 due to bootstrap node. For HA, there should be an odd number of control plane nodes."
+  default     = 2
 }
 
 variable "agent_node_count" {

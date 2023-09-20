@@ -106,7 +106,7 @@ test-cluster:
 		-backend-config="bucket=uds-ci-state-bucket" \
 		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
-	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars” -auto-approve; \
+	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars" -auto-approve; \
 	$${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
 	kubectl get nodes
 
@@ -115,7 +115,7 @@ teardown-infra:
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
 	cd $(E2E_TEST_DIR)/rke2-cluster; \
-	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars” -auto-approve
+	terraform destroy -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars" -auto-approve
 
 .PHONY: cleanup-ami
 cleanup-ami: ## Cleans up snapshots and AMI previously published
@@ -158,7 +158,7 @@ test-cluster-dev: ## Deploy rke2-cluster terraform module using the last built A
 		-backend-config="key=tfstate/$$(openssl rand -hex 3)-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var="vpc_name=rke2-dev" -var="subnet_name=rke2-dev-public*" -var-file="$(DISTRO).tfvars" -auto-approve; \
-	$${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
+	source $${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
 	kubectl get nodes
 
 # Grab generated SSH key from terraform outputs

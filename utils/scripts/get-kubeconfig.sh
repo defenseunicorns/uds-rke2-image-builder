@@ -9,8 +9,12 @@ bootstrap_ip=$(terraform output -raw bootstrap_ip)
 node_user=$(terraform output -raw node_user)
 cluster_hostname=$(terraform output -raw cluster_hostname)
 
-# Wait on cloud-init to finish running on cluster node
-ssh -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip} "cloud-init status --wait"
+# Try ssh up to 10 times waiting 15 seconds between tries
+for i in $(seq 1 10); do
+    # Wait on cloud-init to finish running on cluster node
+    ssh -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip} "cloud-init status --wait" && break
+    sleep 15
+done
 # Copy kubectl from cluster node
 scp -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip}:/home/${node_user}/.kube/config ~/.kube/rke2-config
 

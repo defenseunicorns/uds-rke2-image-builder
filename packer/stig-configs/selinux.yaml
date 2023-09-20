@@ -1,0 +1,2 @@
+# If host is using SELinux, then this needs set for RKE2
+selinux: true
