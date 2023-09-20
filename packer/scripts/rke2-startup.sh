@@ -209,4 +209,4 @@ chmod 0750 logs
 chmod 0600 token
 ls -l
 
-info "RKE2 Installation Complete"
+info "RKE2 Startup Complete"
