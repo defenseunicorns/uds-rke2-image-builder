@@ -137,7 +137,7 @@ full-down: teardown-infra-dev cleanup-ami ## Tears down test infrastructure and 
 
 # Test AMI with baked in RKE2 startup script in dev account
 .PHONY: validate-rke2-terraform-dev
-validate-rke2-terraform--dev: ## Validate rke2-cluster terraform module changes
+validate-rke2-terraform-dev: ## Validate rke2-cluster terraform module changes
 	TEST_AMI_ID=$$(jq -r '.builds[-1].artifact_id' $(AWS_DIR)/manifest.json | cut -d ":" -f2); \
 	echo "TEST AMI: $${TEST_AMI_ID}"; \
 	cd $(E2E_TEST_DIR)/rke2-cluster; \

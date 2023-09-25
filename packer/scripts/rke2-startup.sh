@@ -74,9 +74,9 @@ debug=0
 
 while getopts "t:T:s:u:avd" o; do
     case "${o}" in
-    t) token="${OPTARG}" ;;
-    T) tls_sans="${OPTARG}" ;;
-    s) server_host="${OPTARG}" ;;
+    t) token=${OPTARG} ;;
+    T) tls_sans=${OPTARG} ;;
+    s) server_host=${OPTARG} ;;
     a) agent=1 ;;
     d) debug=1 ;;
     u) user=${OPTARG} ;;
@@ -119,6 +119,12 @@ if [ -f $stig_conf_dir/audit-policy.yaml ]; then
     info "Copying audit-policy to destination"
     cp $stig_conf_dir/audit-policy.yaml $config_dir/audit-policy.yaml
 fi
+if [ -f $stig_conf_dir/non-cis-pss.yaml ]; then
+    info "Copying non-cis-pss to destination"
+    cp $stig_conf_dir/non-cis-pss.yaml $config_dir/non-cis-pss.yaml
+
+    echo "pod-security-admission-config-file: $config_dir/non-cis-pss.yaml" | tee -a $config_file >/dev/null
+fi
 if [ -f $stig_conf_dir/rke2-stig.yaml ]; then
     info "Copying rke2 stig configuration to destination"
     cp $stig_conf_dir/rke2-stig.yaml $config_subdir/00-rke2-stig.yaml
@@ -130,11 +136,11 @@ else
     info "SELinux not enforced or not installed. Skipping SELinux config."
 fi
 
-if [ $server_host != $node_ip ]; then
+if [ "$server_host" != "$node_ip" ]; then
     debug "Updating Config file with Cluster Join Server IP"
     echo "server: https://${server_host}:9345" | tee -a $config_file >/dev/null
 fi
-if [ $token ]; then
+if [ "$token" ]; then
     debug "Updating Config file with Cluster Join token"
     echo "token: ${token}" | tee -a $config_file >/dev/null
 fi
