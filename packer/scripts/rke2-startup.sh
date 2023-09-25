@@ -123,7 +123,7 @@ if [ -f $stig_conf_dir/rke2-stig.yaml ]; then
     info "Copying rke2 stig configuration to destination"
     cp $stig_conf_dir/rke2-stig.yaml $config_subdir/00-rke2-stig.yaml
 fi
-if [ -f $stig_conf_dir/selinux.yaml ] || [ "$(getenforce)" == "Enforcing" ]; then
+if [ -f $stig_conf_dir/selinux.yaml ] && [ "$(getenforce)" == "Enforcing" ]; then
     info "Copying rke2 stig configuration to destination"
     cp $stig_conf_dir/selinux.yaml $config_subdir/01-selinux.yaml
 else
@@ -164,49 +164,54 @@ mkdir /home/$user/.kube
 cp /etc/rancher/rke2/rke2.yaml /home/$user/.kube/config
 chown -R $user:$user /home/$user/.kube
 
+# Copy kubectl into /usr/local/bin so it is in user's PATH
+cp /var/lib/rancher/rke2/bin/kubectl /usr/local/bin/kubectl
+chmod 755 /usr/local/bin/kubectl
+
 # Ensure host permissions match STIG rules
 info "Updating file permissions for STIG rules"
-cd /etc/rancher/rke2
-chmod -R 0600 ./*
-chown -R root:root ./*
-ls -l
 
-cd /var/lib/rancher/rke2
-chown root:root ./*
-ls -l
+next_dir=/etc/rancher/rke2
+chmod -R 0600 $next_dir/*
+chown -R root:root $next_dir/*
+ls -l $next_dir
 
-cd /var/lib/rancher/rke2/agent
-chown root:root ./*
-chmod 0700 pod-manifests
-chmod 0700 etc
-find . -maxdepth 1 -type f -name "*.kubeconfig" -exec chmod 0640 {} \;
-find . -maxdepth 1 -type f -name "*.crt" -exec chmod 0600 {} \;
-find . -maxdepth 1 -type f -name "*.key" -exec chmod 0600 {} \;
-ls -l
+next_dir=/var/lib/rancher/rke2
+chown root:root $next_dir/*
+ls -l $next_dir
 
-cd /var/lib/rancher/rke2/agent/bin
-chown root:root ./*
-chmod 0750 ./*
-ls -l
+next_dir=/var/lib/rancher/rke2/agent
+chown root:root $next_dir/*
+chmod 0700 $next_dir/pod-manifests
+chmod 0700 $next_dir/etc
+find $next_dir -maxdepth 1 -type f -name "*.kubeconfig" -exec chmod 0640 {} \;
+find $next_dir -maxdepth 1 -type f -name "*.crt" -exec chmod 0600 {} \;
+find $next_dir -maxdepth 1 -type f -name "*.key" -exec chmod 0600 {} \;
+ls -l $next_dir
 
-cd /var/lib/rancher/rke2/agent
-chown root:root data
-chmod 0750 data
-ls -l
+next_dir=/var/lib/rancher/rke2/agent/bin
+chown root:root $next_dir/*
+chmod 0750 $next_dir/*
+ls -l $next_dir
 
-cd /var/lib/rancher/rke2/data
-chown root:root ./*
-chmod 0640 ./*
-ls -l
+next_dir=/var/lib/rancher/rke2/agent
+chown root:root $next_dir/data
+chmod 0750 $next_dir/data
+ls -l $next_dir
 
-cd /var/lib/rancher/rke2/server
-chown root:root ./*
-chmod 0700 cred
-chmod 0700 db
-chmod 0700 tls
-chmod 0751 manifests
-chmod 0750 logs
-chmod 0600 token
-ls -l
+next_dir=/var/lib/rancher/rke2/data
+chown root:root $next_dir/*
+chmod 0640 $next_dir/*
+ls -l $next_dir
+
+next_dir=/var/lib/rancher/rke2/server
+chown root:root $next_dir/*
+chmod 0700 $next_dir/cred
+chmod 0700 $next_dir/db
+chmod 0700 $next_dir/tls
+chmod 0751 $next_dir/manifests
+chmod 0750 $next_dir/logs
+chmod 0600 $next_dir/token
+ls -l $next_dir
 
 info "RKE2 Startup Complete"

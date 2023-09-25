@@ -16,7 +16,7 @@ data "aws_vpc" "vpc" {
 
 data "aws_subnet" "test_subnet" {
   vpc_id            = data.aws_vpc.vpc.id
-  availability_zone = "us-west-2a"
+  availability_zone = "${var.region}a"
 
   filter {
     name   = "tag:Name"

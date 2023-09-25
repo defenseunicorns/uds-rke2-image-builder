@@ -9,7 +9,7 @@ fi
 
 if [[ "${CLUSTER_SANS}" ]]; then
     echo "Passing SANs to RKE2 startup script: ${CLUSTER_SANS}"
-    san_options="-T ${CLUSTER_SANS}"
+    san_options="-T \"${CLUSTER_SANS}\""
 fi
 
 echo "Bootstrap node IP: $${bootstrap_ip}"

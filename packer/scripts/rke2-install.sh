@@ -41,10 +41,6 @@ curl -sfL https://get.rke2.io --output install.sh
 cd /root/rke2-artifacts/ && chmod +x install.sh
 INSTALL_RKE2_ARTIFACT_PATH=/root/rke2-artifacts ./install.sh
 
-# Copy kubectl into /usr/local/bin so it is in user's PATH
-cp /var/lib/rancher/rke2/bin/kubectl /usr/local/bin/kubectl
-chmod 755 /usr/local/bin/kubectl
-
 # Configure settings needed by CIS profile
 sudo cp -f /usr/local/share/rke2/rke2-cis-sysctl.conf /etc/sysctl.d/60-rke2-cis.conf
 sudo systemctl restart systemd-sysctl
