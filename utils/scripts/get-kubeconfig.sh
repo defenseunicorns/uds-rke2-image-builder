@@ -23,7 +23,7 @@ mkdir -p ~/.kube
 scp -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip}:/home/${node_user}/.kube/config ~/.kube/rke2-config
 
 # Replace the loopback address with the cluster hostname
-sed -i "s/127.0.0.1/${cluster_hostname}/g" ~/.kube/rke2-config
+sed -i "s/127.0.0.1/${bootstrap_ip}/g" ~/.kube/rke2-config
 export KUBECONFIG=~/.kube/rke2-config
 
 # find existing host record in the host file and save the line numbers
