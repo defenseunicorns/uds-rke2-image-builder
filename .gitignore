@@ -10,5 +10,14 @@ crash.log
 # Packer manifest
 manifest.json
 
+# Local .terraform files
+.terraform/
+.terraform.lock.hcl
+
+# Auto tfvars used for local testing
+*.auto.tfvars
 # Packer auto vars
 *.auto.pkrvars.hcl
+
+# SSH private keys
+*.pem
