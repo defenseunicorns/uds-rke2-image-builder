@@ -101,7 +101,7 @@ test-cluster:
 		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars" -auto-approve; \
-	$${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
+	source $${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
 	kubectl get nodes
 
 .PHONY: teardown-infra
@@ -159,7 +159,6 @@ test-cluster-dev: ## Deploy rke2-cluster terraform module using the last built A
 		-backend-config="region=us-west-2"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var="vpc_name=rke2-dev" -var="subnet_name=rke2-dev-public*" -var-file="$(DISTRO).tfvars" -auto-approve; \
 	source $${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
-	export KUBECONFIG=~/.kube/rke2-config; \
 	kubectl get nodes
 
 # Grab generated SSH key from terraform outputs
