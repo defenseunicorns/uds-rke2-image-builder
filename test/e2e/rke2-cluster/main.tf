@@ -105,7 +105,7 @@ resource "aws_instance" "test_agent_node" {
 }
 
 resource "aws_security_group" "test_node_sg" {
-  name        = "rke2-startup-script-test-sg"
+  name        = "${var.os_distro}-rke2-test-sg"
   description = "SG providing settings for RKE2"
   vpc_id      = data.aws_vpc.vpc.id
 
