@@ -66,7 +66,7 @@ build {
     ]
     // STIG-ing must be run as root
     execute_command   = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
-    script            = "../scripts/stig.sh"
+    script            = "../scripts/os-stig.sh"
     expect_disconnect = length(var.ubuntu_pro_token) > 0
     timeout           = "20m"
   }
@@ -91,6 +91,26 @@ build {
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/cleanup-deps.sh"
+    timeout         = "15m"
+  }
+
+  provisioner "file" {
+    source      = "../scripts/rke2-startup.sh"
+    destination = "/tmp/rke2-startup.sh"
+  }
+
+  provisioner "file" {
+    source      = "../stig-configs"
+    destination = "/tmp"
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "default_user=packer"
+    ]
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    // Move files out of /tmp so they persist in created image
+    script          = "../scripts/move-files.sh"
     timeout         = "15m"
   }
 
