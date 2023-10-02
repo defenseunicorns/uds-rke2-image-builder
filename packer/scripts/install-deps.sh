@@ -14,7 +14,7 @@ elif [[ $DISTRO == "ubuntu" ]]; then
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
     apt-add-repository ppa:ansible/ansible -y
     apt-get update -y && apt-get upgrade -y
-    apt-get install ansible unzip iptables-persistent -y
+    apt-get install ansible unzip iptables-persistent jq -y
 else
     echo "$DISTRO not an expected distribution."
 fi

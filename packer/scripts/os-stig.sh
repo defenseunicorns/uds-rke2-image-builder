@@ -17,10 +17,14 @@ unzip ansible.zip
 unzip *-ansible.zip
 chmod +x enforce.sh && ./enforce.sh
 
-# FIPS - Conditionally performed based of subscription being provided
+# FIPS - Conditionally performed based on subscription being enabled
 if [[ $DISTRO == "ubuntu" && $UBUNTU_PRO_TOKEN ]]; then
-  pro attach $UBUNTU_PRO_TOKEN
-  apt-get install ubuntu-advantage-tools -y
-  pro enable fips-updates --assume-yes # TBD should this just be the `fips` "certified" install?
-  reboot # Reboot to enable FIPS before proceeding
+  if [[ $UBUNTU_PRO_TOKEN ]]; then
+    pro attach $UBUNTU_PRO_TOKEN
+  fi
+  if [[ $(pro status --format json | jq '.attached') == "true" ]]; then
+    apt-get install ubuntu-advantage-tools -y
+    pro enable fips-updates --assume-yes
+    reboot # Reboot to enable FIPS before proceeding
+  fi
 fi
