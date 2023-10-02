@@ -6,30 +6,46 @@ DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel
 echo "Performing OS prep necessary for DUBBD on RKE2..."
 
 # iptables for RKE2
-iptables -A INPUT -p tcp -m tcp --dport 2379 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 2380 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 9345 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 6443 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p udp -m udp --dport 8472 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 10250 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 30000:32767 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 4240 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 179 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p udp -m udp --dport 4789 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 5473 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 9098 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 9099 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p udp -m udp --dport 51820 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p udp -m udp --dport 51821 -m state --state NEW -j ACCEPT
-iptables -A INPUT -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -p icmp --icmp-type 0 -m state --state ESTABLISHED,RELATED -j ACCEPT
 if [[ $DISTRO == "rhel" ]]; then
-    # Save nftables and make them load when nftables starts
-    nft -s list ruleset > /etc/nftables/rules.v4.nft
-    echo "include \"/etc/nftables/rules.v4.nft\"" >> /etc/sysconfig/nftables.conf
-    systemctl enable nftables
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 2379 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 2380 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 9345 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 6443 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 udp dport 8472 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 10250 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 30000-32767 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 4240 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 179 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 udp dport 4789 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 5473 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 9098 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 9099 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 udp dport 51820 ct state new accept
+  nft add rule ip filter input ip saddr 0.0.0.0/0 udp dport 51821 ct state new accept
+  nft add rule ip filter input ip protocol icmp icmp type echo-request ct state new,established,related accept
+  nft add rule ip filter output ip protocol icmp icmp type echo-reply ct state established,related accept
+  nft -s list ruleset > /etc/nftables/rules.v4.nft
+  echo "include \"/etc/nftables/rules.v4.nft\"" >> /etc/sysconfig/nftables.conf
+  systemctl enable nftables
 elif [[ $DISTRO == "ubuntu" ]]; then
-    iptables-save > /etc/iptables/rules.v4
+  iptables -A INPUT -p tcp -m tcp --dport 2379 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 2380 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 9345 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 6443 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p udp -m udp --dport 8472 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 10250 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 30000:32767 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 4240 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 179 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p udp -m udp --dport 4789 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 5473 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 9098 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 9099 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p udp -m udp --dport 51820 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p udp -m udp --dport 51821 -m state --state NEW -j ACCEPT
+  iptables -A INPUT -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+  iptables -A OUTPUT -p icmp --icmp-type 0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+  iptables-save > /etc/iptables/rules.v4
 fi
 
 echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf
