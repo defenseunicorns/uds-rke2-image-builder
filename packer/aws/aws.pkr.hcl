@@ -57,7 +57,7 @@ build {
     // STIG-ing must be run as root
     execute_command   = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script            = "../scripts/os-stig.sh"
-    expect_disconnect = length(var.ubuntu_pro_token) > 0
+    expect_disconnect = true // Expect a restart due to FIPS reboot
     timeout           = "20m"
   }
 
