@@ -37,6 +37,13 @@ build {
   name    = local.ami_name
   sources = ["source.amazon-ebs.base"]
 
+  // Ubuntu Pro subscription attachment happens during cloud-init when using a Pro AMI
+  provisioner "shell" {
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    inline          = ["cloud-init status --wait"]
+    timeout         = "20m"
+  }
+
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/install-deps.sh"

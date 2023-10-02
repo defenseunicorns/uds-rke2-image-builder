@@ -17,8 +17,8 @@ unzip ansible.zip
 unzip *-ansible.zip
 chmod +x enforce.sh && ./enforce.sh
 
-# FIPS - Conditionally performed based on subscription being enabled
-if [[ $DISTRO == "ubuntu" && $UBUNTU_PRO_TOKEN ]]; then
+# FIPS - Conditionally performed based on subscription being attached
+if [[ $DISTRO == "ubuntu" ]]; then
   if [[ $UBUNTU_PRO_TOKEN ]]; then
     pro attach $UBUNTU_PRO_TOKEN
   fi
