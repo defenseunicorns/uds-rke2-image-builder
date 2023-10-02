@@ -102,7 +102,9 @@ test-cluster:
 		-backend-config="region=us-west-2"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars" -auto-approve; \
 	source $${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
-	kubectl get nodes
+	kubectl wait --for=condition=Ready nodes --all --timeout=600s; \
+	kubectl apply -f ../manifests/test.yaml; \
+	kubectl wait --for=condition=Ready -n test pod/test-pod --timeout=60s
 
 .PHONY: teardown-infra
 teardown-infra:

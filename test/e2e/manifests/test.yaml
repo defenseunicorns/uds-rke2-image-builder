@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test
+  labels:
+    zarf.dev/agent: ignore
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+  namespace: test
+spec:
+  containers:
+    - name: test-container
+      image: ghcr.io/stefanprodan/podinfo:6.5.0
+      command:
+        - ./podinfo
