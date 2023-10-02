@@ -8,7 +8,7 @@ if [[ $DISTRO == "rhel" ]]; then
     yum remove unzip ansible -y
 elif [[ $DISTRO == "ubuntu" ]]; then
     # Cleanup temp files and utils
-    apt-get remove ansible unzip -y
+    apt-get remove ansible unzip jq -y
     apt-get autoremove -y
 else
     echo "$DISTRO not an expected distribution."
