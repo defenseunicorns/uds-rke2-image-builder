@@ -67,7 +67,7 @@ build {
     // STIG-ing must be run as root
     execute_command   = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script            = "../scripts/os-stig.sh"
-    expect_disconnect = length(var.ubuntu_pro_token) > 0
+    expect_disconnect = true
     timeout           = "20m"
   }
 
@@ -110,8 +110,8 @@ build {
     ]
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     // Move files out of /tmp so they persist in created image
-    script          = "../scripts/move-files.sh"
-    timeout         = "15m"
+    script  = "../scripts/move-files.sh"
+    timeout = "15m"
   }
 
   provisioner "shell" {
