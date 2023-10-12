@@ -1,19 +1,19 @@
 #!/bin/bash
 
 usage() {
-    echo "Usage: Utility script for installing a RKE2 cluster"
-    echo "  -t  [string_val] cluster join token"
-    echo "  -T  [string_val] space delimited list of TLS SANs to add to node certificate"
-    echo "  -s  [string_val] cluster server join ip or hostname (Ex. 10.0.0.1 or cluster.foo.bar)"
-    echo "  -a               agent flag"
-    echo "  -v               Verbose information about RKE2 installation"
-    echo "  -d               Print Debug information"
-    echo "  -u               kube config user"
-    echo "EXAMPLE Usage: "
-    echo "  Server install with user set: $0 -t 24dfa62bbe214bdf -s 10.10.0.1 -u ubuntu"
-    echo "  Agent install:  $0 -t 24dfa62bbe214bdf -s 10.10.0.1 -a"
-    echo "  Server install with SANS:  $0 -t 24dfa62bbe214bdf -T \"awesome.hostname.com 10.10.10.10\" -s 10.10.0.1"
-    exit 1
+  echo "Usage: Utility script for installing a RKE2 cluster"
+  echo "  -t  [string_val] cluster join token"
+  echo "  -T  [string_val] space delimited list of TLS SANs to add to node certificate"
+  echo "  -s  [string_val] cluster server join ip or hostname (Ex. 10.0.0.1 or cluster.foo.bar)"
+  echo "  -a               agent flag"
+  echo "  -v               Verbose information about RKE2 installation"
+  echo "  -d               Print Debug information"
+  echo "  -u               kube config user"
+  echo "EXAMPLE Usage: "
+  echo "  Server install with user set: $0 -t 24dfa62bbe214bdf -s 10.10.0.1 -u ubuntu"
+  echo "  Agent install:  $0 -t 24dfa62bbe214bdf -s 10.10.0.1 -a"
+  echo "  Server install with SANS:  $0 -t 24dfa62bbe214bdf -T \"awesome.hostname.com 10.10.10.10\" -s 10.10.0.1"
+  exit 1
 }
 
 verbose_docs() {
@@ -33,10 +33,10 @@ Script Parameters:
 '-T' By default cluster generated certificate is only valid for the loopback address and private IPs it can find on interfaces. When accessing cluster from a hostname or public IP, they need to be provided so they can be added to the cluster certificate.
 
 Recommended Usage:
-    Node0: \$0 -t <token> -s <node0_ip>
-    Node1: \$0 -t <token> -s <node0_ip>
-    Node2: \$0 -t <token> -s <node0_ip>
-    NodeN: \$0 -t <token> -s <node0_ip> -a
+  Node0: \$0 -t <token> -s <node0_ip>
+  Node1: \$0 -t <token> -s <node0_ip>
+  Node2: \$0 -t <token> -s <node0_ip>
+  NodeN: \$0 -t <token> -s <node0_ip> -a
 
 This recommendation would build an HA cluster consistent with the recommendations in the RKE2 documentation. These commands could be executed simultaneously on each node. The RKE2 systemd service (registered by this script) has retry logic and will wait for the first node to be ready in order to join the cluster.
 
@@ -51,14 +51,14 @@ exit 0
 }
 
 info() {
-    echo -e "\033[1;32m[INFO]\033[0m $1"
+  echo -e "\033[1;32m[INFO]\033[0m $1"
 }
 
 # Function to print debug messages
 debug() {
-    if [ "$debug" ]; then
-        echo -e "\033[1;34m[DEBUG]\033[0m $1"
-    fi
+  if [ "$debug" ]; then
+    echo -e "\033[1;34m[DEBUG]\033[0m $1"
+  fi
 }
 
 if [ "$EUID" -ne 0 ]
@@ -67,13 +67,13 @@ if [ "$EUID" -ne 0 ]
 fi
 
 if [ $# -eq 0 ]; then
-    usage
+  usage
 fi
 
 debug=0
 
 while getopts "t:T:s:u:avd" o; do
-    case "${o}" in
+  case "${o}" in
     t) token=${OPTARG} ;;
     T) tls_sans=${OPTARG} ;;
     s) server_host=${OPTARG} ;;
@@ -82,7 +82,7 @@ while getopts "t:T:s:u:avd" o; do
     u) user=${OPTARG} ;;
     v) verbose_docs ;;
     *) usage ;;
-    esac
+  esac
 done
 shift $(($OPTIND - 1))
 
@@ -90,78 +90,50 @@ info "Starting RKE2 cluster"
 node_ip=$(ip route get $(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+') | grep -oP 'src \K\S+')
 
 if [ "$user" == "" ]; then
-    user=$USER
+  user=$USER
 fi
 
-debug "Token: $token"
 debug "Server IP: $server_host"
 debug "Agent: $agent"
 debug "Node IP: $node_ip"
-debug "User: $user"
 debug "TLS SANS: $tls_sans"
 
-info "Creating RKE2 Config file"
-config_dir=/etc/rancher/rke2
-config_subdir=/etc/rancher/rke2/config.yaml.d
-config_file=$config_dir/config.yaml
-mkdir -p $config_dir
-mkdir -p $config_subdir
-
-cat <<EOF >"$config_file"
-profile: "cis-1.23"
-disable:
-  - rke2-ingress-nginx
-  - rke2-metrics-server
-EOF
-
-stig_conf_dir=/root/stig-configs
-if [ -f $stig_conf_dir/audit-policy.yaml ]; then
-    info "Copying audit-policy to destination"
-    cp $stig_conf_dir/audit-policy.yaml $config_dir/audit-policy.yaml
-fi
-if [ -f $stig_conf_dir/non-cis-pss.yaml ]; then
-    info "Copying non-cis-pss to destination"
-    cp $stig_conf_dir/non-cis-pss.yaml $config_dir/non-cis-pss.yaml
-
-    echo "pod-security-admission-config-file: $config_dir/non-cis-pss.yaml" | tee -a $config_file >/dev/null
-fi
-if [ -f $stig_conf_dir/rke2-stig.yaml ]; then
-    info "Copying rke2 stig configuration to destination"
-    cp $stig_conf_dir/rke2-stig.yaml $config_subdir/00-rke2-stig.yaml
-fi
-if [ -f $stig_conf_dir/selinux.yaml ] && [ "$(getenforce)" == "Enforcing" ]; then
-    info "Copying rke2 stig configuration to destination"
-    cp $stig_conf_dir/selinux.yaml $config_subdir/01-selinux.yaml
-else
-    info "SELinux not enforced or not installed. Skipping SELinux config."
-fi
-
 if [ "$server_host" != "$node_ip" ]; then
-    debug "Updating Config file with Cluster Join Server IP"
-    echo "server: https://${server_host}:9345" | tee -a $config_file >/dev/null
+  debug "Updating Config file with Cluster Join Server IP"
+  echo "server: https://${server_host}:9345" | tee -a $config_file >/dev/null
 fi
 if [ "$token" ]; then
-    debug "Updating Config file with Cluster Join token"
-    echo "token: ${token}" | tee -a $config_file >/dev/null
+  debug "Updating Config file with Cluster Join token"
+  echo "token: ${token}" | tee -a $config_file >/dev/null
 fi
 if [ "${tls_sans}" ]; then
-    debug "Updating Config file with TLS SANs"
-    echo "tls-san:" | tee -a $config_file >/dev/null
-    for san in $tls_sans
-    do
-        echo "  - \"${san}\"" | tee -a $config_file >/dev/null
-    done
+  debug "Updating Config file with TLS SANs"
+  echo "tls-san:" | tee -a $config_file >/dev/null
+  for san in $tls_sans
+  do
+    echo "  - \"${san}\"" | tee -a $config_file >/dev/null
+  done
 fi
 
 # Start RKE2
 if [ -z $agent ]; then
-    debug "Enabling systemd service for RKE2 Server"
-    systemctl enable rke2-server.service
-    systemctl start rke2-server.service
+  debug "Enabling systemd service for RKE2 Server"
+  systemctl enable rke2-server.service
+  systemctl start rke2-server.service
 else
-    debug "Enabling systemd service for RKE2 Agent"
-    systemctl enable rke2-agent.service
-    systemctl start rke2-agent.service
+  debug "Enabling systemd service for RKE2 Agent"
+  systemctl enable rke2-agent.service
+  systemctl start rke2-agent.service
+fi
+
+# Ensure host permissions match STIG rules
+info "Updating file permissions for STIG rules"
+chmod 640 /var/lib/rancher/rke2/agent/*.kubeconfig
+chmod 750 /var/lib/rancher/rke2/bin/*
+chmod 750 /var/lib/rancher/rke2/data
+if [ -d "/var/lib/rancher/rke2/server" ]; then
+  chmod 750 /var/lib/rancher/rke2/server/logs
+  chmod 750 /var/lib/rancher/rke2/server/manifests
 fi
 
 # Copy kubeconfig to default user home directory
@@ -173,51 +145,5 @@ chown -R $user:$user /home/$user/.kube
 # Copy kubectl into /usr/local/bin so it is in user's PATH
 cp /var/lib/rancher/rke2/bin/kubectl /usr/local/bin/kubectl
 chmod 755 /usr/local/bin/kubectl
-
-# Ensure host permissions match STIG rules
-info "Updating file permissions for STIG rules"
-
-next_dir=/etc/rancher/rke2
-chmod -R 0600 $next_dir/*
-chown -R root:root $next_dir/*
-ls -l $next_dir
-
-next_dir=/var/lib/rancher/rke2
-chown root:root $next_dir/*
-ls -l $next_dir
-
-next_dir=/var/lib/rancher/rke2/agent
-chown root:root $next_dir/*
-chmod 0700 $next_dir/pod-manifests
-chmod 0700 $next_dir/etc
-find $next_dir -maxdepth 1 -type f -name "*.kubeconfig" -exec chmod 0640 {} \;
-find $next_dir -maxdepth 1 -type f -name "*.crt" -exec chmod 0600 {} \;
-find $next_dir -maxdepth 1 -type f -name "*.key" -exec chmod 0600 {} \;
-ls -l $next_dir
-
-next_dir=/var/lib/rancher/rke2/agent/bin
-chown root:root $next_dir/*
-chmod 0750 $next_dir/*
-ls -l $next_dir
-
-next_dir=/var/lib/rancher/rke2/agent
-chown root:root $next_dir/data
-chmod 0750 $next_dir/data
-ls -l $next_dir
-
-next_dir=/var/lib/rancher/rke2/data
-chown root:root $next_dir/*
-chmod 0640 $next_dir/*
-ls -l $next_dir
-
-next_dir=/var/lib/rancher/rke2/server
-chown root:root $next_dir/*
-chmod 0700 $next_dir/cred
-chmod 0700 $next_dir/db
-chmod 0700 $next_dir/tls
-chmod 0751 $next_dir/manifests
-chmod 0750 $next_dir/logs
-chmod 0600 $next_dir/token
-ls -l $next_dir
 
 info "RKE2 Startup Complete"

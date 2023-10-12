@@ -3,7 +3,7 @@
 This repo contains Packer code to produce STIG'd RKE2 images for various environments. Built images will have:
 - Base OS (currently supporting RHEL 8 and Ubuntu 20.04)
 - STIGs applied to the OS
-- RKE2 pre-installed and airgap ready (all images pre-installed)
+- RKE2 pre-installed, STIG'd, and airgap ready (all images pre-installed)
 
 ## Supported Builds
 
