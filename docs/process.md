@@ -24,7 +24,6 @@ The [RKE2 Install script](../packer/scripts/rke2-install.sh) installs RKE2, suit
 - Handling prerequisite requirements: Modifying network manager and disabling services that conflict with cluster networking (see [this](https://docs.rke2.io/known_issues#firewalld-conflicts-with-default-networking) and [this](https://docs.rke2.io/known_issues#networkmanager))
 - Staging image tarballs: Image tarballs are downloaded and placed in the correct location for usage in an airgap (see [here](https://docs.rke2.io/install/airgap#tarball-method))
 - Run the RKE2 install script from upstream: This is pulled directly from RKE2 docs [here](https://docs.rke2.io/install/airgap#rke2-installsh-script-install)
-- Add the etcd user and sysctl config from RKE2: This follows the process documented in the [RKE2 CIS Hardening guide](https://docs.rke2.io/security/hardening_guide#ensure-etcd-is-configured-properly)
 
 ## OS Preparation
 
@@ -41,3 +40,5 @@ The final portion of the build copies a few files into the image and ensures the
 - An RKE2 config file pre-configured to meet STIG rules (note that some STIG rules are met by default with RKE2 and not included in this configuration explicitly)
 - A default pod security config - this allows full privileges for running pods and is added with the expectation that a policy enforcement engine like Kyverno or Gatekeeper is being used to restrict the same things, with exceptions as necessary
 - A helper script for RKE2 startup - while RKE2 can certainly be run without this, this script can be used to add the RKE2 join address, token, and other properties to the RKE2 config file. It also corrects file permissions according to the STIG guide for files that do not exist until RKE2 startup has occurred.
+
+Additionally the etcd user and sysctl config are added for RKE2. This follows the process documented in the [RKE2 CIS Hardening guide](https://docs.rke2.io/security/hardening_guide#ensure-etcd-is-configured-properly).

@@ -48,12 +48,11 @@ elif [[ $DISTRO == "ubuntu" ]]; then
   iptables-save > /etc/iptables/rules.v4
 fi
 
+# ulimit and sysctl changes for DUBBD
 echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf
 echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf
 echo "* soft nproc  13181250" >> /etc/security/limits.d/ulimits.conf
 echo "* hard nproc  13181250" >> /etc/security/limits.d/ulimits.conf
-
-# sysctl changes for DUBBD
 sysctl -w vm.max_map_count=524288
 echo "vm.max_map_count=524288" > /etc/sysctl.d/vm-max_map_count.conf
 sysctl -w fs.nr_open=13181252
