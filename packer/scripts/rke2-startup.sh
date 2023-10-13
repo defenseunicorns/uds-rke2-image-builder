@@ -128,13 +128,42 @@ fi
 
 # Ensure host permissions match STIG rules
 info "Updating file permissions for STIG rules"
-chmod 640 /var/lib/rancher/rke2/agent/*.kubeconfig
-chmod 750 /var/lib/rancher/rke2/bin/*
-chmod 750 /var/lib/rancher/rke2/data
-if [ -d "/var/lib/rancher/rke2/server" ]; then
-  chmod 750 /var/lib/rancher/rke2/server/logs
-  chmod 750 /var/lib/rancher/rke2/server/manifests
-fi
+
+next_dir=/etc/rancher/rke2
+chmod -R 0600 $next_dir/*
+chown -R root:root $next_dir/*
+
+next_dir=/var/lib/rancher/rke2
+chown root:root $next_dir/*
+
+next_dir=/var/lib/rancher/rke2/agent
+chown root:root $next_dir/*
+chmod 0700 $next_dir/pod-manifests
+chmod 0700 $next_dir/etc
+find $next_dir -maxdepth 1 -type f -name "*.kubeconfig" -exec chmod 0640 {} \;
+find $next_dir -maxdepth 1 -type f -name "*.crt" -exec chmod 0600 {} \;
+find $next_dir -maxdepth 1 -type f -name "*.key" -exec chmod 0600 {} \;
+
+next_dir=/var/lib/rancher/rke2/agent/bin
+chown root:root $next_dir/*
+chmod 0750 $next_dir/*
+
+next_dir=/var/lib/rancher/rke2/agent
+chown root:root $next_dir/data
+chmod 0750 $next_dir/data
+
+next_dir=/var/lib/rancher/rke2/data
+chown root:root $next_dir/*
+chmod 0640 $next_dir/*
+
+next_dir=/var/lib/rancher/rke2/server
+chown root:root $next_dir/*
+chmod 0700 $next_dir/cred
+chmod 0700 $next_dir/db
+chmod 0700 $next_dir/tls
+chmod 0751 $next_dir/manifests
+chmod 0750 $next_dir/logs
+chmod 0600 $next_dir/token
 
 # Copy kubeconfig to default user home directory
 debug "Copying kubeconfig to user home directory"
