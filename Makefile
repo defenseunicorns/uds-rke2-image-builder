@@ -4,8 +4,7 @@ SHELL := /bin/bash
 AWS_DIR := packer/aws
 NUTANIX_DIR := packer/nutanix
 
-E2E_TEST_DIR := test/e2e
-UTIL_SCRIPTS_DIR := utils/scripts
+E2E_TEST_DIR := .github/test-infra
 
 ######################
 # Make Targets
@@ -101,7 +100,7 @@ test-cluster:
 		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars" -auto-approve; \
-	source $${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
+	source $${ROOT_DIR}/$(E2E_TEST_DIR)/scripts/get-kubeconfig.sh; \
 	kubectl wait --for=condition=Ready nodes --all --timeout=600s; \
 	kubectl apply -f ../manifests/test.yaml; \
 	kubectl wait --for=condition=Ready -n test pod/test-pod --timeout=60s
@@ -160,7 +159,7 @@ test-cluster-dev: ## Deploy rke2-cluster terraform module using the last built A
 		-backend-config="key=tfstate/$$(openssl rand -hex 3)-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var="vpc_name=rke2-dev" -var="subnet_name=rke2-dev-public*" -var-file="$(DISTRO).tfvars" -auto-approve; \
-	source $${ROOT_DIR}/$(UTIL_SCRIPTS_DIR)/get-kubeconfig.sh; \
+	source $${ROOT_DIR}/$(E2E_TEST_DIR)/scripts/get-kubeconfig.sh; \
 	kubectl get nodes
 
 # Grab generated SSH key from terraform outputs
