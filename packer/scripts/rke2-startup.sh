@@ -26,6 +26,8 @@ if [ "$user" == "" ]; then
   user=$USER
 fi
 
+config_file=/etc/rancher/rke2/config.yaml
+
 if [ "$server_host" != "$node_ip" ]; then
   echo "server: https://${server_host}:9345" | tee -a $config_file >/dev/null
 fi
