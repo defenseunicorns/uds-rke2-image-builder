@@ -18,8 +18,8 @@ add_rule_ipt() {
 DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
 
 # Port requirements for RKE2 based on https://docs.rke2.io/install/requirements#networking
-tcp_ports=("2379" "2380" "9345" "6443" "8472" "10250" "30000-32767" "4240" "179" "4789" "5473" "9098" "9099" "51820" "51821")
-udp_ports=("51820" "51821")
+tcp_ports=("2379" "2380" "9345" "6443" "10250" "30000-32767" "4240" "179" "5473" "9098" "9099")
+udp_ports=("8472" "4789" "51820" "51821")
 
 # Add firewall rules per distro
 if [[ $DISTRO == "rhel" ]]; then
