@@ -10,7 +10,7 @@ add_rule_nft() {
 
 add_rule_ipt() {
   local protocol="$1"
-  local port="$2"
+  local port="${2/-/:}" # Replace the hyphen with a colon for iptables if needed
   iptables -A INPUT -p "$protocol" --dport "$port" -m state --state NEW -j ACCEPT
 }
 
@@ -23,6 +23,9 @@ udp_ports=("51820" "51821")
 
 # Add firewall rules per distro
 if [[ $DISTRO == "rhel" ]]; then
+  nft add table ip filter
+  nft add chain ip filter input { type filter hook input priority 0\; }
+  nft add chain ip filter output { type filter hook output priority 0\; }
   for port in "${tcp_ports[@]}"; do
     add_rule_nft tcp "$port"
   done
@@ -88,3 +91,21 @@ if [[ $DISTRO == "rhel" ]]; then
 elif [[ $DISTRO == "ubuntu" ]]; then
     update-grub
 fi
+
+# If Network Manager is being used configure it to ignore calico/flannel network interfaces - https://docs.rke2.io/known_issues#networkmanager
+if systemctl list-units --full | grep -Poi "NetworkManager.service" &>/dev/null; then
+  # Indent with tabs to prevent spaces in heredoc output
+	cat <<- EOF > /etc/NetworkManager/conf.d/rke2-canal.conf
+	[keyfile]
+	unmanaged-devices=interface-name:cali*;interface-name:flannel*
+	EOF
+  systemctl reload NetworkManager
+fi
+
+# If present, disable services that interfere with cluster networking - https://docs.rke2.io/known_issues#firewalld-conflicts-with-default-networking
+services_to_disable=("firewalld" "nm-cloud-setup" "nm-cloud-setup.timer")
+for service in "${services_to_disable[@]}"; do
+  if systemctl list-units --full | grep -Poi "$service.service" &>/dev/null; then
+    systemctl disable "$service.service"
+  fi
+done

@@ -16,12 +16,11 @@ The [OS STIG script](../packer/scripts/os-stig.sh) leverages Ansible provided by
 
 Leveraging this automation ensures that we stay as close to the source of the STIG as possible, and do not have to implement all the STIG fixes/checks ourselves.
 
-The one piece not implemented in the Ansible STIG content is the enabling/installation of FIPS packages. RHEL recommends starting with a base OS that already has FIPS enabled, but for Ubuntu we have implemented lightweight logic to enable the FIPS packages.
+The one piece not implemented in the Ansible STIG content is the enabling/installation of FIPS packages. Lightweight logic has been added to enable FIPS (note that FIPS on Ubuntu requires a subscription). For RHEL it is ideal to start with a base image that is FIPS enabled to ensure full FIPS compliance.
 
 ## RKE2 Install
 
 The [RKE2 Install script](../packer/scripts/rke2-install.sh) installs RKE2, suitable for both server and agent nodes, following the upstream [RKE2 airgapped install guide](https://docs.rke2.io/install/airgap). The basic steps involved in our current script involve:
-- Handling prerequisite requirements: Modifying network manager and disabling services that conflict with cluster networking (see [this](https://docs.rke2.io/known_issues#firewalld-conflicts-with-default-networking) and [this](https://docs.rke2.io/known_issues#networkmanager))
 - Staging image tarballs: Image tarballs are downloaded and placed in the correct location for usage in an airgap (see [here](https://docs.rke2.io/install/airgap#tarball-method))
 - Run the RKE2 install script from upstream: This is pulled directly from RKE2 docs [here](https://docs.rke2.io/install/airgap#rke2-installsh-script-install)
 
@@ -30,6 +29,7 @@ The [RKE2 Install script](../packer/scripts/rke2-install.sh) installs RKE2, suit
 The [OS Preparation script](../packer/scripts/os-prep.sh) changes a number of things on the base OS to ensure smooth operation of RKE2 and UDS pieces running on top such as [DUBBD](https://github.com/defenseunicorns/uds-package-dubbd). Requirements were pulled from upstream documentation:
 - [RKE2 Networking (iptables) requirements](https://docs.rke2.io/install/requirements#networking)
 - Big Bang sysctl/SELinux requirements: [general requirements](https://docs-bigbang.dso.mil/latest/docs/prerequisites/os-preconfiguration/) and [logging specific requirements](https://docs-bigbang.dso.mil/latest/packages/fluentbit/docs/TROUBLESHOOTING/?h=fs.inotify.max_user_watches%2F#Too-many-open-files)
+- Handling prerequisite requirements: Modifying network manager and disabling services that conflict with cluster networking (see [this](https://docs.rke2.io/known_issues#firewalld-conflicts-with-default-networking) and [this](https://docs.rke2.io/known_issues#networkmanager))
 
 While these commands could be run at startup (via cloud-init or similar), configuration at build-time ensures that they are not forgotten and allows us to keep the startup process simpler.
 
