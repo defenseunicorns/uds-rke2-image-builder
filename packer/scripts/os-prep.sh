@@ -60,9 +60,6 @@ sysctl_settings["fs.nr_open"]=13181250
 sysctl_settings["fs.file-max"]=13181250
 sysctl_settings["fs.inotify.max_user_instances"]=1024
 sysctl_settings["fs.inotify.max_user_watches"]=1048576
-sysctl_settings["vm.overcommit_memory"]=1
-sysctl_settings["kernel.panic"]=10
-sysctl_settings["kernel.panic_on_oops"]=1
 for key in "${!sysctl_settings[@]}"; do
   value="${sysctl_settings[$key]}"
   sysctl -w "$key=$value"
