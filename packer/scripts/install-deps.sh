@@ -1,9 +1,10 @@
 #!/bin/bash
-# Install dependencies and cli tools needed by other packer scripts
+set -e
 
-# Detect distro. This works fine with only rhel and ubuntu in the list, but will not work as is if you need to distinguish ubuntu/debian or rhel/fedora
+# Detect distro, ubuntu or rhel supported
 DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
 
+# Install dependencies and cli tools needed by other packer scripts
 if [[ $DISTRO == "rhel" ]]; then
     yum update -y && yum upgrade -y
     yum install ansible unzip iptables nftables -y
@@ -15,8 +16,6 @@ elif [[ $DISTRO == "ubuntu" ]]; then
     apt-add-repository ppa:ansible/ansible -y
     apt-get update -y && apt-get upgrade -y
     apt-get install ansible unzip iptables-persistent jq -y
-else
-    echo "$DISTRO not an expected distribution."
 fi
 
 # Ensure that ansible collections needed are installed 

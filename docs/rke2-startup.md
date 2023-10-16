@@ -16,10 +16,12 @@ This script provides a number of parameters depending on your desired configurat
 This script should be run on each node with a minimum of 3 server nodes for an HA setup, plus additional agent nodes as needed. Ideally you should also setup loadbalancing for server nodes (at minimum round-robin with DNS) so that a single node failure does not cause access issues.
 
 An example setup is provided below:
-- Node1: `/root/rke2-startup.sh -t <token> -s <node1_ip> -T <my_rke2_dns_address>`
-- Node2: `/root/rke2-startup.sh -t <token> -s <my_rke2_dns_address> -T <my_rke2_dns_address>`
-- Node3: `/root/rke2-startup.sh -t <token> -s <my_rke2_dns_address> -T <my_rke2_dns_address>`
-- NodeN (agent nodes): `/root/rke2-startup.sh -t <token> -s <my_rke2_dns_address> -a`
+- Node1: `/root/rke2-startup.sh -t <token> -s <node1_ip> -T <rke2_lb_address>`
+- Node2: `/root/rke2-startup.sh -t <token> -s <rke2_lb_address> -T <rke2_dns_address>`
+- Node3: `/root/rke2-startup.sh -t <token> -s <rke2_lb_address> -T <rke2_dns_address>`
+- NodeN (agent nodes): `/root/rke2-startup.sh -t <token> -s <rke2_lb_address> -a`
+
+To generate a token you can use something like `openssl rand -hex 32` to generate a secure random string.
 
 ## Additional RKE2 Links
 

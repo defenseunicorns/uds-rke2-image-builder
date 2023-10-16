@@ -5,10 +5,15 @@ This repo contains Packer code to produce STIG'd RKE2 images for various environ
 - STIGs applied to the OS
 - RKE2 pre-installed, STIG'd, and airgap ready (all images pre-installed)
 
+For more details on what happens during the image building process see [this doc](./docs/builder-steps.md).
+
 ## Supported Builds
 
+This repo currently supports the following target environments:
 - AWS AMI: See [this directory](./packer/aws) and associated make targets with `make help | grep AWS`
 - Nutanix Image: See [this directory](./packer/nutanix) and associated make targets with `make help | grep Nutanix`
+
+Note that depending on your intended target environment you may be able to build with one of these and export to another environment.
 
 ## Local Testing
 

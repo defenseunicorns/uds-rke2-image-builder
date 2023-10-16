@@ -1,4 +1,4 @@
-# Image Building Process
+# Image Builder Steps
 
 The approach taken in this repo for image builds is meant to be the simplest path to get to a secure, minimal image with all RKE2 dependencies baked in, ready for the airgap. Wherever possible we leverage existing/upstream tooling so that we are not reinventing processes that require maintenance and diverge from the upstream.
 
