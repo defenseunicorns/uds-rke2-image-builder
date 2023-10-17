@@ -10,7 +10,7 @@ The first step of each image build involves installing any tooling necessary for
 
 As necessary installation/cleanup have branching logic to handle different package managers for different operating systems (ex: yum vs apt-get).
 
-## OS STIG-ing
+## OS STIG
 
 The [OS STIG script](../packer/scripts/os-stig.sh) leverages Ansible provided by DISA as part of their [automation content](https://public.cyber.mil/stigs/supplemental-automation-content/).
 
@@ -33,7 +33,7 @@ The [OS Preparation script](../packer/scripts/os-prep.sh) changes a number of th
 
 While these commands could be run at startup (via cloud-init or similar), configuration at build-time ensures that they are not forgotten and allows us to keep the startup process simpler.
 
-## RKE2 STIG Helpers
+## RKE2 STIG
 
 The final portion of the build copies a few files into the image and ensures they have proper ownership for usage at runtime. The [RKE2 STIG](https://www.stigviewer.com/stig/rancher_government_solutions_rke2/2022-10-13/) is the basis for these files. The files added are:
 - An audit policy adhering to [this STIG rule](https://www.stigviewer.com/stig/rancher_government_solutions_rke2/2022-10-13/finding/V-254555)
@@ -41,4 +41,4 @@ The final portion of the build copies a few files into the image and ensures the
 - A default pod security config - this allows full privileges for running pods and is added with the expectation that a policy enforcement engine like Kyverno or Gatekeeper is being used to restrict the same things, with exceptions as necessary
 - A helper script for RKE2 startup - while RKE2 can certainly be run without this, this script can be used to add the RKE2 join address, token, and other properties to the RKE2 config file. It also corrects file permissions according to the STIG guide for files that do not exist until RKE2 startup has occurred.
 
-Additionally the etcd user and sysctl config are added for RKE2. This follows the process documented in the [RKE2 CIS Hardening guide](https://docs.rke2.io/security/hardening_guide#ensure-etcd-is-configured-properly).
+Additionally the etcd user and a sysctl config are added for RKE2. This follows the process documented in the [RKE2 CIS Hardening guide](https://docs.rke2.io/security/hardening_guide#ensure-etcd-is-configured-properly).

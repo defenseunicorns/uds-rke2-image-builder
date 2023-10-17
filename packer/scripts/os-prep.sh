@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-# Helper functions for adding firewall rules
+# Add firewall rule with nftables (RHEL)
 add_rule_nft() {
   local protocol="$1"
   local port="$2"
   nft add rule ip filter input ip saddr 0.0.0.0/0 "$protocol" dport "$port" ct state new accept
 }
-
+# Add firewall rule with iptables (Ubuntu)
 add_rule_ipt() {
   local protocol="$1"
   local port="${2/-/:}" # Replace the hyphen with a colon for iptables if needed
@@ -17,11 +17,10 @@ add_rule_ipt() {
 # Detect distro, ubuntu or rhel supported
 DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
 
-# Port requirements for RKE2 based on https://docs.rke2.io/install/requirements#networking
+# Firewall open port requirements for RKE2 based on https://docs.rke2.io/install/requirements#networking
 tcp_ports=("2379" "2380" "9345" "6443" "10250" "30000-32767" "4240" "179" "5473" "9098" "9099")
 udp_ports=("8472" "4789" "51820" "51821")
 
-# Add firewall rules per distro
 if [[ $DISTRO == "rhel" ]]; then
   nft add table ip filter
   nft add chain ip filter input { type filter hook input priority 0\; }
@@ -60,6 +59,7 @@ sysctl_settings["fs.nr_open"]=13181250
 sysctl_settings["fs.file-max"]=13181250
 sysctl_settings["fs.inotify.max_user_instances"]=1024
 sysctl_settings["fs.inotify.max_user_watches"]=1048576
+
 for key in "${!sysctl_settings[@]}"; do
   value="${sysctl_settings[$key]}"
   sysctl -w "$key=$value"
@@ -74,19 +74,17 @@ for module in "${modules[@]}"; do
   echo "$module" >> "/etc/modules-load.d/istio-modules.conf"
 done
 
-# cgroupsv2 for RKE2 + NeuVector - https://docs.rke2.io/known_issues#control-groups-v2
+# cgroupsv2 for RKE2 + NeuVector
 sed -i 's/GRUB_CMDLINE_LINUX=\"/GRUB_CMDLINE_LINUX=\"systemd.unified_cgroup_hierarchy=1/' /etc/default/grub
-
 BOOT_TYPE=$([ -d /sys/firmware/efi ] && echo UEFI || echo BIOS)
-
 if [[ $DISTRO == "rhel" ]]; then
-    if [[ $BOOT_TYPE == "BIOS" ]]; then
-        grub2-mkconfig -o /boot/grub2/grub.cfg
-    else
-        grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
-    fi
+  if [[ $BOOT_TYPE == "BIOS" ]]; then
+    grub2-mkconfig -o /boot/grub2/grub.cfg
+  else
+    grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+  fi
 elif [[ $DISTRO == "ubuntu" ]]; then
-    update-grub
+  update-grub
 fi
 
 # If Network Manager is being used configure it to ignore calico/flannel network interfaces - https://docs.rke2.io/known_issues#networkmanager

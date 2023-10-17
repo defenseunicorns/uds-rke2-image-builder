@@ -9,25 +9,20 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-while getopts "t:T:s:u:a" o; do
+while getopts "t:T:s:a" o; do
   case "${o}" in
     t) token=${OPTARG} ;;
     T) tls_sans=${OPTARG} ;;
     s) server_host=${OPTARG} ;;
     a) agent=1 ;;
-    u) user=${OPTARG} ;;
     *) exit 1 ;;
   esac
 done
 
-node_ip=$(ip route get $(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+') | grep -oP 'src \K\S+')
-
-if [ "$user" == "" ]; then
-  user=$USER
-fi
-
+# Setup config file server, token, and TLS SANs
 config_file=/etc/rancher/rke2/config.yaml
 
+node_ip=$(ip route get $(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+') | grep -oP 'src \K\S+')
 if [ "$server_host" != "$node_ip" ]; then
   echo "server: https://${server_host}:9345" | tee -a $config_file >/dev/null
 fi
@@ -51,7 +46,7 @@ else
   systemctl start rke2-agent.service
 fi
 
-# Ensure file permissions match STIG rules
+# Ensure file permissions match STIG rules - https://www.stigviewer.com/stig/rancher_government_solutions_rke2/2022-10-13/finding/V-254564
 dir=/etc/rancher/rke2
 chmod -R 0600 $dir/*
 chown -R root:root $dir/*

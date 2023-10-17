@@ -6,10 +6,10 @@ DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel
 
 # Cleanup dependencies and utils that shouldn't be in final image
 if [[ $DISTRO == "rhel" ]]; then
-    yum remove unzip ansible -y
+  yum remove unzip ansible -y
 elif [[ $DISTRO == "ubuntu" ]]; then
-    apt-get remove ansible unzip jq -y
-    apt-get autoremove -y
+  apt-get remove ansible unzip jq -y
+  apt-get autoremove -y
 fi
 
 cd && rm -rf /tmp/*
