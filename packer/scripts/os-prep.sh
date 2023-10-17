@@ -100,7 +100,8 @@ fi
 # If present, disable services that interfere with cluster networking - https://docs.rke2.io/known_issues#firewalld-conflicts-with-default-networking
 services_to_disable=("firewalld" "nm-cloud-setup" "nm-cloud-setup.timer")
 for service in "${services_to_disable[@]}"; do
-  if systemctl list-units --full | grep -Poi "$service.service" &>/dev/null; then
+  if systemctl list-units --full -all | grep -Poi "$service.service" &>/dev/null; then
+    systemctl stop "$service.service"
     systemctl disable "$service.service"
   fi
 done

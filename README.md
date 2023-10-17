@@ -17,4 +17,4 @@ Note that for other target environments you may be able to build with one of the
 
 ## Local Testing
 
-TBD - avoid AWS as much as possible :upsidedown-face:
+Currently this repo does not support completely local development, you must have an AWS or Nutanix environment (depending on your target deployment).
