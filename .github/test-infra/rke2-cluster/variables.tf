@@ -48,7 +48,7 @@ variable "allowed_in_cidrs" {
 
 variable "cluster_hostname" {
   type        = string
-  description = "Hostname to use for connecting to cluster API. Gets merged with cluster_sans list var. cluster.foo.bar default used by CI tests"
+  description = "Hostname to use for connecting to cluster API. cluster.foo.bar default used by CI tests"
   default     = "cluster.foo.bar"
 }
 

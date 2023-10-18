@@ -15,7 +15,7 @@ if [[ "${CLUSTER_SANS}" ]]; then
 fi
 
 if [[ "${AGENT_NODE}" == "true" ]]; then
-    /root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} -s $${bootstrap_ip} -a
+    /root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} "$${san_options[@]}" -s $${bootstrap_ip} -a
 else
-    /root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} -s $${bootstrap_ip}
+    /root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} "$${san_options[@]}" -s $${bootstrap_ip}
 fi
