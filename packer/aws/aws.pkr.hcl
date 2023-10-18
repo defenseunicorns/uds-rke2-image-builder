@@ -80,12 +80,6 @@ build {
 
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
-    script          = "../scripts/aws-cli-install.sh"
-    timeout         = "15m"
-  }
-
-  provisioner "shell" {
-    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/cleanup-deps.sh"
     timeout         = "15m"
   }
