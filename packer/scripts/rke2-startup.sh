@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run as root"
+  echo "Script must be run as root"
   exit 1
 fi
 
@@ -20,16 +20,19 @@ while getopts "t:T:s:a" o; do
 done
 
 # Setup config file server, token, and TLS SANs
+echo "Updating RKE2 Config file"
 config_file=/etc/rancher/rke2/config.yaml
 
 node_ip=$(ip route get $(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+') | grep -oP 'src \K\S+')
 if [ "$server_host" != "$node_ip" ]; then
+  echo "Adding Cluster Join Server IP: ${server_host}"
   echo "server: https://${server_host}:9345" | tee -a $config_file >/dev/null
 fi
 if [ "$token" ]; then
   echo "token: ${token}" | tee -a $config_file >/dev/null
 fi
 if [ "${tls_sans}" ]; then
+  echo "Adding TLS SANs: ${tls_sans}"
   echo "tls-san:" | tee -a $config_file >/dev/null
   for san in $tls_sans
   do
@@ -38,6 +41,7 @@ if [ "${tls_sans}" ]; then
 fi
 
 # Start RKE2
+echo "Starting RKE2 service"
 if [ -z $agent ]; then
   systemctl enable rke2-server.service
   systemctl start rke2-server.service
@@ -47,6 +51,7 @@ else
 fi
 
 # Ensure file permissions match STIG rules - https://www.stigviewer.com/stig/rancher_government_solutions_rke2/2022-10-13/finding/V-254564
+echo "Fixing RKE2 file permissions for STIG"
 dir=/etc/rancher/rke2
 chmod -R 0600 $dir/*
 chown -R root:root $dir/*
