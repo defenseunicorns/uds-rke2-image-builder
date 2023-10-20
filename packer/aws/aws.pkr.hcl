@@ -29,7 +29,8 @@ source "amazon-ebs" "base" {
   region          = var.region
   ssh_username    = var.ssh_username
   source_ami      = data.amazon-ami.base-ami.id
-
+  ssh_interface   = "session_manager"
+  communicator    = "ssh"
   skip_create_ami = var.skip_create_ami
 }
 
