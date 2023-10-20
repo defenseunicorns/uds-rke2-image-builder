@@ -1,98 +1,107 @@
 #!/bin/bash
+set -e
 
-# Detect distro. This works fine with only rhel and ubuntu in the list, but will not work as is if you need to distinguish ubuntu/debian or rhel/fedora
+# Add firewall rule with nftables (RHEL)
+add_rule_nft() {
+  local protocol="$1"
+  local port="$2"
+  nft add rule ip filter input ip saddr 0.0.0.0/0 "$protocol" dport "$port" ct state new accept
+}
+# Add firewall rule with iptables (Ubuntu)
+add_rule_ipt() {
+  local protocol="$1"
+  local port="${2/-/:}" # Replace the hyphen with a colon for iptables if needed
+  iptables -A INPUT -p "$protocol" --dport "$port" -m state --state NEW -j ACCEPT
+}
+
+# Detect distro, ubuntu or rhel supported
 DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
 
-echo "Performing OS prep necessary for DUBBD on RKE2..."
+# Firewall open port requirements for RKE2 based on https://docs.rke2.io/install/requirements#networking
+tcp_ports=("2379" "2380" "9345" "6443" "10250" "30000-32767" "4240" "179" "5473" "9098" "9099")
+udp_ports=("8472" "4789" "51820" "51821")
 
-# iptables for RKE2
 if [[ $DISTRO == "rhel" ]]; then
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 2379 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 2380 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 9345 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 6443 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 udp dport 8472 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 10250 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 30000-32767 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 4240 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 179 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 udp dport 4789 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 5473 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 9098 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 tcp dport 9099 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 udp dport 51820 ct state new accept
-  nft add rule ip filter input ip saddr 0.0.0.0/0 udp dport 51821 ct state new accept
+  nft add table ip filter
+  nft add chain ip filter input { type filter hook input priority 0\; }
+  nft add chain ip filter output { type filter hook output priority 0\; }
+  for port in "${tcp_ports[@]}"; do
+    add_rule_nft tcp "$port"
+  done
+  for port in "${udp_ports[@]}"; do
+    add_rule_nft udp "$port"
+  done
+  # Add ICMP rules
   nft add rule ip filter input ip protocol icmp icmp type echo-request ct state new,established,related accept
   nft add rule ip filter output ip protocol icmp icmp type echo-reply ct state established,related accept
+  # Persist rules on restart
   nft -s list ruleset > /etc/nftables/rules.v4.nft
   echo "include \"/etc/nftables/rules.v4.nft\"" >> /etc/sysconfig/nftables.conf
   systemctl enable nftables
 elif [[ $DISTRO == "ubuntu" ]]; then
-  iptables -A INPUT -p tcp -m tcp --dport 2379 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 2380 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 9345 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 6443 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p udp -m udp --dport 8472 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 10250 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 30000:32767 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 4240 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 179 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p udp -m udp --dport 4789 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 5473 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 9098 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p tcp -m tcp --dport 9099 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p udp -m udp --dport 51820 -m state --state NEW -j ACCEPT
-  iptables -A INPUT -p udp -m udp --dport 51821 -m state --state NEW -j ACCEPT
+  for port in "${tcp_ports[@]}"; do
+    add_rule_ipt tcp "$port"
+  done
+  for port in "${udp_ports[@]}"; do
+    add_rule_ipt udp "$port"
+  done
+  # Add ICMP rules
   iptables -A INPUT -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
   iptables -A OUTPUT -p icmp --icmp-type 0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+  # Persist rules on restart
   iptables-save > /etc/iptables/rules.v4
 fi
 
-echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf
-echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf
-echo "* soft nproc  13181250" >> /etc/security/limits.d/ulimits.conf
-echo "* hard nproc  13181250" >> /etc/security/limits.d/ulimits.conf
+# sysctl changes for Big Bang apps - https://docs-bigbang.dso.mil/latest/docs/prerequisites/os-preconfiguration/
+declare -A sysctl_settings
+sysctl_settings["vm.max_map_count"]=524288
+sysctl_settings["fs.nr_open"]=13181250
+sysctl_settings["fs.file-max"]=13181250
+sysctl_settings["fs.inotify.max_user_instances"]=1024
+sysctl_settings["fs.inotify.max_user_watches"]=1048576
 
-# sysctl changes for DUBBD
-sysctl -w vm.max_map_count=524288
-echo "vm.max_map_count=524288" > /etc/sysctl.d/vm-max_map_count.conf
-sysctl -w fs.nr_open=13181252
-echo "fs.nr_open=13181252" > /etc/sysctl.d/fs-nr_open.conf
-sysctl -w fs.file-max=13181250
-echo "fs.file-max=13181250" > /etc/sysctl.d/fs-file-max.conf
-echo "fs.inotify.max_user_instances=1024" > /etc/sysctl.d/fs-inotify-max_user_instances.conf
-sysctl -w fs.inotify.max_user_instances=1024
-echo "fs.inotify.max_user_watches=1048576" > /etc/sysctl.d/fs-inotify-max_user_watches.conf
-sysctl -w fs.inotify.max_user_watches=1048576
-echo "vm.overcommit_memory=1" >> /etc/sysctl.d/90-kubelet.conf
-sysctl -w vm.overcommit_memory=1
-echo "kernel.panic=10" >> /etc/sysctl.d/90-kubelet.conf
-sysctl -w kernel.panic=10
-echo "kernel.panic_on_oops=1" >> /etc/sysctl.d/90-kubelet.conf
-sysctl -w kernel.panic_on_oops=1
+for key in "${!sysctl_settings[@]}"; do
+  value="${sysctl_settings[$key]}"
+  sysctl -w "$key=$value"
+  echo "$key=$value" > "/etc/sysctl.d/$key.conf"
+done
 sysctl -p
 
-# modprobes for Istio
-modprobe br_netfilter
-modprobe xt_REDIRECT
-modprobe xt_owner
-modprobe xt_statistic
-echo "br_netfilter" >> /etc/modules-load.d/istio-iptables.conf
-echo "xt_REDIRECT" >> /etc/modules-load.d/istio-iptables.conf
-echo "xt_owner" >> /etc/modules-load.d/istio-iptables.conf
-echo "xt_statistic" >> /etc/modules-load.d/istio-iptables.conf
+# Kernel Modules for Istio - https://istio.io/latest/docs/setup/platform-setup/prerequisites/
+modules=("br_netfilter" "xt_REDIRECT" "xt_owner" "xt_statistic" "iptable_mangle" "iptable_nat" "xt_conntrack" "xt_tcpudp")
+for module in "${modules[@]}"; do
+  modprobe "$module"
+  echo "$module" >> "/etc/modules-load.d/istio-modules.conf"
+done
 
 # cgroupsv2 for RKE2 + NeuVector
 sed -i 's/GRUB_CMDLINE_LINUX=\"/GRUB_CMDLINE_LINUX=\"systemd.unified_cgroup_hierarchy=1/' /etc/default/grub
-
 BOOT_TYPE=$([ -d /sys/firmware/efi ] && echo UEFI || echo BIOS)
-
 if [[ $DISTRO == "rhel" ]]; then
-    if [[ $BOOT_TYPE == "BIOS" ]]; then
-        grub2-mkconfig -o /boot/grub2/grub.cfg
-    else
-        grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
-    fi
+  if [[ $BOOT_TYPE == "BIOS" ]]; then
+    grub2-mkconfig -o /boot/grub2/grub.cfg
+  else
+    grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+  fi
 elif [[ $DISTRO == "ubuntu" ]]; then
-    update-grub
+  update-grub
 fi
+
+# If Network Manager is being used configure it to ignore calico/flannel network interfaces - https://docs.rke2.io/known_issues#networkmanager
+if systemctl list-units --full | grep -Poi "NetworkManager.service" &>/dev/null; then
+  # Indent with tabs to prevent spaces in heredoc output
+	cat <<- EOF > /etc/NetworkManager/conf.d/rke2-canal.conf
+	[keyfile]
+	unmanaged-devices=interface-name:cali*;interface-name:flannel*
+	EOF
+  systemctl reload NetworkManager
+fi
+
+# If present, disable services that interfere with cluster networking - https://docs.rke2.io/known_issues#firewalld-conflicts-with-default-networking
+services_to_disable=("firewalld" "nm-cloud-setup" "nm-cloud-setup.timer")
+for service in "${services_to_disable[@]}"; do
+  if systemctl list-units --full -all | grep -Poi "$service.service" &>/dev/null; then
+    systemctl stop "$service.service"
+    systemctl disable "$service.service"
+  fi
+done

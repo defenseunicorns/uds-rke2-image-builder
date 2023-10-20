@@ -80,12 +80,6 @@ build {
 
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
-    script          = "../scripts/aws-cli-install.sh"
-    timeout         = "15m"
-  }
-
-  provisioner "shell" {
-    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/cleanup-deps.sh"
     timeout         = "15m"
   }
@@ -101,12 +95,8 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "default_user=${var.ssh_username}"
-    ]
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
-    // Move files out of /tmp so they persist in created image
-    script          = "../scripts/move-files.sh"
+    script          = "../scripts/rke2-config.sh"
     timeout         = "15m"
   }
 

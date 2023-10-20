@@ -105,13 +105,9 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars = [
-      "default_user=packer"
-    ]
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
-    // Move files out of /tmp so they persist in created image
-    script  = "../scripts/move-files.sh"
-    timeout = "15m"
+    script          = "../scripts/rke2-config.sh"
+    timeout         = "15m"
   }
 
   provisioner "shell" {

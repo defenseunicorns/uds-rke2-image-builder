@@ -20,6 +20,7 @@ done
 mkdir -p ~/.kube
 
 # Copy kubectl from cluster node
+ssh -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip} "mkdir -p /home/${node_user}/.kube && sudo cp /etc/rancher/rke2/rke2.yaml /home/${node_user}/.kube/config && sudo chown ${node_user} /home/${node_user}/.kube/config"
 scp -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip}:/home/${node_user}/.kube/config ~/.kube/rke2-config
 
 # Replace the loopback address with the cluster hostname

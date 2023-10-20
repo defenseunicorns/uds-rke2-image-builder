@@ -14,10 +14,8 @@ if [[ "${CLUSTER_SANS}" ]]; then
     san_options=(-T "$${public_ipv4} ${CLUSTER_SANS}")
 fi
 
-echo "Bootstrap node IP: $${bootstrap_ip}"
-
 if [[ "${AGENT_NODE}" == "true" ]]; then
-    /root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} "$${san_options[@]}" -s $${bootstrap_ip} -u ${DEFAULT_USER} -a
+    /root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} "$${san_options[@]}" -s $${bootstrap_ip} -a
 else
-    /root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} "$${san_options[@]}" -s $${bootstrap_ip} -u ${DEFAULT_USER}
+    /root/rke2-startup.sh -t ${RKE2_JOIN_TOKEN} "$${san_options[@]}" -s $${bootstrap_ip}
 fi
