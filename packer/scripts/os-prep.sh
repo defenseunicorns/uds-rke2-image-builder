@@ -1,56 +1,8 @@
 #!/bin/bash
 set -e
 
-# Add firewall rule with nftables (RHEL)
-add_rule_nft() {
-  local protocol="$1"
-  local port="$2"
-  nft add rule ip filter input ip saddr 0.0.0.0/0 "$protocol" dport "$port" ct state new accept
-}
-# Add firewall rule with iptables (Ubuntu)
-add_rule_ipt() {
-  local protocol="$1"
-  local port="${2/-/:}" # Replace the hyphen with a colon for iptables if needed
-  iptables -A INPUT -p "$protocol" --dport "$port" -m state --state NEW -j ACCEPT
-}
-
 # Detect distro, ubuntu or rhel supported
 DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
-
-# Firewall open port requirements for RKE2 based on https://docs.rke2.io/install/requirements#networking
-tcp_ports=("2379" "2380" "9345" "6443" "10250" "30000-32767" "4240" "179" "5473" "9098" "9099")
-udp_ports=("8472" "4789" "51820" "51821")
-
-if [[ $DISTRO == "rhel" ]]; then
-  nft add table ip filter
-  nft add chain ip filter input { type filter hook input priority 0\; }
-  nft add chain ip filter output { type filter hook output priority 0\; }
-  for port in "${tcp_ports[@]}"; do
-    add_rule_nft tcp "$port"
-  done
-  for port in "${udp_ports[@]}"; do
-    add_rule_nft udp "$port"
-  done
-  # Add ICMP rules
-  nft add rule ip filter input ip protocol icmp icmp type echo-request ct state new,established,related accept
-  nft add rule ip filter output ip protocol icmp icmp type echo-reply ct state established,related accept
-  # Persist rules on restart
-  nft -s list ruleset > /etc/nftables/rules.v4.nft
-  echo "include \"/etc/nftables/rules.v4.nft\"" >> /etc/sysconfig/nftables.conf
-  systemctl enable nftables
-elif [[ $DISTRO == "ubuntu" ]]; then
-  for port in "${tcp_ports[@]}"; do
-    add_rule_ipt tcp "$port"
-  done
-  for port in "${udp_ports[@]}"; do
-    add_rule_ipt udp "$port"
-  done
-  # Add ICMP rules
-  iptables -A INPUT -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-  iptables -A OUTPUT -p icmp --icmp-type 0 -m state --state ESTABLISHED,RELATED -j ACCEPT
-  # Persist rules on restart
-  iptables-save > /etc/iptables/rules.v4
-fi
 
 # sysctl changes for Big Bang apps - https://docs-bigbang.dso.mil/latest/docs/prerequisites/os-preconfiguration/
 declare -A sysctl_settings
