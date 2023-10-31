@@ -77,13 +77,11 @@ chmod 0750 $dir
 chown root:root $dir/*
 chmod 0640 $dir/*
 
-if [ -z $agent ]; then
-  dir=/var/lib/rancher/rke2/server
-  chown root:root $dir/*
-  chmod 0700 $dir/cred
-  chmod 0700 $dir/db
-  chmod 0700 $dir/tls
-  chmod 0751 $dir/manifests
-  chmod 0750 $dir/logs
-  chmod 0600 $dir/token
-fi
+dir=/var/lib/rancher/rke2/server
+chown root:root $dir/*
+chmod 0700 $dir/cred
+chmod 0700 $dir/db
+chmod 0700 $dir/tls
+chmod 0751 $dir/manifests
+chmod 0750 $dir/logs
+chmod 0600 $dir/token
