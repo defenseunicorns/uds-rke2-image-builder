@@ -27,7 +27,6 @@ The [RKE2 Install script](../packer/scripts/rke2-install.sh) installs RKE2, suit
 ## OS Preparation
 
 The [OS Preparation script](../packer/scripts/os-prep.sh) changes a number of things on the base OS to ensure smooth operation of RKE2 and UDS pieces running on top such as [DUBBD](https://github.com/defenseunicorns/uds-package-dubbd). Requirements were pulled from upstream documentation:
-- [RKE2 Networking (iptables) requirements](https://docs.rke2.io/install/requirements#networking)
 - Big Bang sysctl/SELinux requirements: [general requirements](https://docs-bigbang.dso.mil/latest/docs/prerequisites/os-preconfiguration/) and [logging specific requirements](https://docs-bigbang.dso.mil/latest/packages/fluentbit/docs/TROUBLESHOOTING/?h=fs.inotify.max_user_watches%2F#Too-many-open-files)
 - Handling prerequisite requirements: Modifying network manager and disabling services that conflict with cluster networking (see [this](https://docs.rke2.io/known_issues#firewalld-conflicts-with-default-networking) and [this](https://docs.rke2.io/known_issues#networkmanager))
 

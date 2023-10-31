@@ -67,15 +67,13 @@ find $dir -maxdepth 1 -type f -name "*.kubeconfig" -exec chmod 0640 {} \;
 find $dir -maxdepth 1 -type f -name "*.crt" -exec chmod 0600 {} \;
 find $dir -maxdepth 1 -type f -name "*.key" -exec chmod 0600 {} \;
 
-dir=/var/lib/rancher/rke2/agent/bin
+dir=/var/lib/rancher/rke2/bin
 chown root:root $dir/*
 chmod 0750 $dir/*
 
-dir=/var/lib/rancher/rke2/agent
-chown root:root $dir/data
-chmod 0750 $dir/data
-
 dir=/var/lib/rancher/rke2/data
+chown root:root $dir
+chmod 0750 $dir
 chown root:root $dir/*
 chmod 0640 $dir/*
 
