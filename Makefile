@@ -30,7 +30,7 @@ publish-ami-ubuntu: ## Build and Publish the Ubuntu AMI for AWS.
 .PHONY: publish-ami-rhel
 publish-ami-rhel: ## Build and Publish the RHEL AMI for AWS.
 	@cd $(AWS_DIR) && packer init .
-	@cd $(AWS_DIR) && packer build --var-file=rhel.pkrvars.hcl .
+	@cd $(AWS_DIR) && packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" .
 
 .PHONY: build-ami-ubuntu
 build-ami-ubuntu: ## Build the Ubuntu AMI for AWS.
