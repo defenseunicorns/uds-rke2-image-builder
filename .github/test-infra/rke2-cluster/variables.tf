@@ -1,13 +1,13 @@
 variable "vpc_name" {
   type        = string
   description = "VPC ID to deploy into"
-  default     = "uds-ci-commercial-842d"
+  default     = "uds-ci-commercial-*"
 }
 
 variable "subnet_name" {
   type        = string
   description = "Name of subnet to use for testing. Can use a wildcard as long as it only matches one subnet per az."
-  default     = "uds-ci-commercial-842d-public*"
+  default     = "uds-ci-commercial-*-public*"
 }
 
 variable "region" {

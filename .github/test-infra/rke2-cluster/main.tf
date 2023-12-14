@@ -5,6 +5,7 @@ provider "aws" {
 terraform {
   backend "s3" {
   }
+  required_version = ">= 1.0.0, < 1.6.0"
 }
 
 data "aws_vpc" "vpc" {

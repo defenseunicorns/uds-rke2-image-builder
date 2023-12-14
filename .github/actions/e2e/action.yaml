@@ -28,6 +28,11 @@ runs:
         GITHUB_REF: ${{ github.event.client_payload.pull_request.head.ref || github.ref_name }}
         GITHUB_OWNER: ${{ github.event.client_payload.github.payload.repository.owner.login || github.repository_owner }}
 
+    - uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: "1.5.7"
+        terraform_wrapper: false
+
     - name: Validate ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
       run: make validate-ami-${{ inputs.distro }}

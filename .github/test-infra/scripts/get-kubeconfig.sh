@@ -2,16 +2,24 @@
 
 # Utility script that can be called from a make target after terraform has deployed the e2e test module
 
-# # Get required outputs from terraform
+echo "terraform version: $(terraform --version)"
+
+# Get required outputs from terraform
 terraform output -raw private_key > key.pem
 chmod 600 key.pem
+
 bootstrap_ip=$(terraform output -raw bootstrap_ip)
+echo "bootstrap_ip: ${bootstrap_ip}"
+
 node_user=$(terraform output -raw node_user)
+echo "node_user: ${node_user}"
+
 cluster_hostname=$(terraform output -raw cluster_hostname)
+echo "cluster_hostname: ${cluster_hostname}"
 
 # Try ssh up to 10 times waiting 15 seconds between tries
 for i in $(seq 1 10); do
-    # Wait on cloud-init to finish running on cluster node
+    echo "Waiting on cloud-init to finish running on cluster node"
     ssh -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip} "cloud-init status --wait" && break
     sleep 15
 done

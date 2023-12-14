@@ -96,7 +96,7 @@ test-cluster:
 	ROOT_DIR=$$(pwd); \
 	cd $(E2E_TEST_DIR)/rke2-cluster; \
 	terraform init -force-copy \
-		-backend-config="bucket=uds-ci-state-bucket" \
+		-backend-config="bucket=uds-aws-ci-commercial-us-west-2-5246-tfstate" \
 		-backend-config="key=tfstate/ci/install/$${SHA:0:7}-packer-$(DISTRO)-rke2-startup-script.tfstate" \
 		-backend-config="region=us-west-2"; \
 	terraform apply -var="ami_id=$${TEST_AMI_ID}" -var-file="$(DISTRO).tfvars" -auto-approve; \
