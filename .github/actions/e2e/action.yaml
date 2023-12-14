@@ -31,6 +31,7 @@ runs:
     - uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: "1.5.7"
+        terraform_wrapper: false
 
     - name: Validate ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
