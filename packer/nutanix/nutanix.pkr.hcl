@@ -10,7 +10,7 @@ packer {
 }
 
 locals {
-  img_name = var.timestamp ? lower("${var.output_image_name}-${formatdate("YYYYMMDDhhmm", timestamp())}") : lower(var.output_image_name)
+  img_name = var.timestamp ? lower("${var.output_image_name}-${rke2_version}-${formatdate("YYYYMMDDhhmm", timestamp())}") : lower(var.output_image_name)
 }
 
 source "nutanix" "base" {
