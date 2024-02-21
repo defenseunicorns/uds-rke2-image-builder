@@ -9,7 +9,7 @@ mkdir -p /tmp/ansible && chmod 700 /tmp/ansible && cd /tmp/ansible
 if [[ $DISTRO == "rhel" ]]; then
   curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R12_STIG_Ansible.zip
 elif [[ $DISTRO == "ubuntu" ]]; then
-  curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_CAN_Ubuntu_20-04_LTS_V1R10_STIG_Ansible.zip
+  curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_CAN_Ubuntu_20-04_LTS_V1R11_STIG_Ansible.zip
 fi
 unzip ansible.zip
 unzip *-ansible.zip
