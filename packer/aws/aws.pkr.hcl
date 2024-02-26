@@ -10,7 +10,7 @@ packer {
 }
 
 locals {
-  ami_name = var.timestamp ? lower("${var.ami_name}-${var.rke2_version}-${formatdate("YYYYMMDDhhmm", timestamp())}") : lower(var.ami_name)
+  ami_name = var.timestamp ? lower("${var.ami_name}-${replace(var.rke2_version, "+", "-")}-${formatdate("YYYYMMDDhhmm", timestamp())}") : lower("${var.ami_name}-${replace(var.rke2_version, "+", "-")}")
 }
 
 data "amazon-ami" "base-ami" {
@@ -23,7 +23,7 @@ data "amazon-ami" "base-ami" {
 }
 
 source "amazon-ebs" "base" {
-  ami_name        = "{{local.ami_name | clean_resource_name}}"
+  ami_name        = local.ami_name
   ami_description = "For UDS deployments on RKE2"
   instance_type   = "t2.micro"
   region          = var.region
@@ -34,7 +34,7 @@ source "amazon-ebs" "base" {
 }
 
 build {
-  name    = "{{local.ami_name | clean_resource_name}}"
+  name    = local.ami_name
   sources = ["source.amazon-ebs.base"]
 
   // Ubuntu Pro subscription attachment happens during cloud-init when using a Pro AMI
