@@ -10,7 +10,7 @@ packer {
 }
 
 locals {
-  img_name = var.timestamp ? lower("${var.output_image_name}-${formatdate("YYYYMMDDhhmm", timestamp())}") : lower(var.output_image_name)
+  img_name = var.timestamp ? lower("${var.output_image_name}-${var.rke2_version}-${formatdate("YYYYMMDDhhmm", timestamp())}") : lower("${var.output_image_name}-${var.rke2_version}")
 }
 
 source "nutanix" "base" {
@@ -41,6 +41,7 @@ source "nutanix" "base" {
   image_export     = var.image_export
   force_deregister = true
   vm_force_delete  = true
+  boot_type        = "uefi"
 
   // Startup / Connection / Shutdown Details
   user_data        = base64encode(file("cloud-config.yaml"))

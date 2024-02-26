@@ -27,7 +27,7 @@ for module in "${modules[@]}"; do
 done
 
 # cgroupsv2 for RKE2 + NeuVector
-sed -i 's/GRUB_CMDLINE_LINUX=\"/GRUB_CMDLINE_LINUX=\"systemd.unified_cgroup_hierarchy=1/' /etc/default/grub
+sed -i 's/GRUB_CMDLINE_LINUX=\"/GRUB_CMDLINE_LINUX=\"systemd.unified_cgroup_hierarchy=1 /' /etc/default/grub
 BOOT_TYPE=$([ -d /sys/firmware/efi ] && echo UEFI || echo BIOS)
 if [[ $DISTRO == "rhel" ]]; then
   if [[ $BOOT_TYPE == "BIOS" ]]; then

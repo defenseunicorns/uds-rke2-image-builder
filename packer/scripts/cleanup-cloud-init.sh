@@ -7,7 +7,7 @@ DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel
 # Cleanup cloud-init and machine-id, this is generally only needed for non-AWS environments
 cloud-init clean
 if [[ $DISTRO == "rhel" ]]; then
-  rm -rf /etc/machine-id
+  truncate -s 0 /etc/machine-id
 elif [[ $DISTRO == "ubuntu" ]]; then
   cloud-init clean --machine-id
 fi
