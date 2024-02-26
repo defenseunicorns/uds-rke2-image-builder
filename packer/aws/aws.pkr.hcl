@@ -10,7 +10,7 @@ packer {
 }
 
 locals {
-  ami_name = var.timestamp ? lower("${var.ami_name}-${formatdate("YYYYMMDDhhmm", timestamp())}") : lower(var.ami_name)
+  ami_name = var.timestamp ? lower("${var.ami_name}-${var.rke2_version}-${formatdate("YYYYMMDDhhmm", timestamp())}") : lower(var.ami_name)
 }
 
 data "amazon-ami" "base-ami" {
