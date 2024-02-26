@@ -23,7 +23,7 @@ data "amazon-ami" "base-ami" {
 }
 
 source "amazon-ebs" "base" {
-  ami_name        = {{local.ami_name | clean_resource_name}}
+  ami_name        = "{{local.ami_name | clean_resource_name}}"
   ami_description = "For UDS deployments on RKE2"
   instance_type   = "t2.micro"
   region          = var.region
@@ -34,7 +34,7 @@ source "amazon-ebs" "base" {
 }
 
 build {
-  name    = {{local.ami_name | clean_resource_name}}
+  name    = "{{local.ami_name | clean_resource_name}}"
   sources = ["source.amazon-ebs.base"]
 
   // Ubuntu Pro subscription attachment happens during cloud-init when using a Pro AMI
