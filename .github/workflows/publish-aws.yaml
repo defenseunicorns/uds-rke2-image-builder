@@ -27,6 +27,9 @@ jobs:
           aws-region: us-west-2
           # 21600 seconds == 6 hours
           role-duration-seconds: 21600
+      - name: Setup UDS
+        if: always()
+        uses: defenseunicorns/uds-common/.github/actions/setup@v0.3.11
       - name: Publish Ubuntu AMI
         run: uds run publish-ami-ubuntu
   publish-rhel:
@@ -42,5 +45,8 @@ jobs:
           aws-region: us-west-2
           # 21600 seconds == 6 hours
           role-duration-seconds: 21600
+      - name: Setup UDS
+        if: always()
+        uses: defenseunicorns/uds-common/.github/actions/setup@v0.3.11
       - name: Publish RHEL AMI
         run: uds run publish-ami-rhel
