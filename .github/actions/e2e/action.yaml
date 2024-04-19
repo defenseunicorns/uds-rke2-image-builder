@@ -39,30 +39,30 @@ runs:
 
     - name: Validate ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
-      run: uds run validate-ami-${{ inputs.distro }}
+      run: uds run --no-progress validate-ami-${{ inputs.distro }}
 
     - name: Publish ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
-      run: uds run publish-ami-${{ inputs.distro }}
+      run: uds run --no-progress publish-ami-${{ inputs.distro }}
 
     - name: Test ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
       env:
         SHA: ${{ github.sha }}
         DISTRO: ${{ inputs.distro }}
-      run: uds run test-cluster
+      run: uds run --no-progress test-cluster
 
     - name: Teardown test infrastructure
       shell: bash -e -o pipefail {0}
       if: always()
       env:
         DISTRO: ${{ inputs.distro }}
-      run: uds run teardown-infra
+      run: uds run --no-progress teardown-infra
 
     - name: Cleanup ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
       if: always()
-      run: uds run cleanup-ami
+      run: uds run --no-progress cleanup-ami
 
     # Update GitHub status for successful pipeline run
     - name: "Update GitHub Status for success"

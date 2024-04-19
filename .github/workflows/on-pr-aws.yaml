@@ -31,9 +31,9 @@ jobs:
         if: always()
         uses: defenseunicorns/uds-common/.github/actions/setup@v0.3.11
       - name: Validate Ubuntu AMI
-        run: uds run validate-ami-ubuntu
+        run: uds run --no-progress validate-ami-ubuntu
       - name: Build Ubuntu AMI
-        run: uds run build-ami-ubuntu
+        run: uds run --no-progress build-ami-ubuntu
   test-rhel-build:
     runs-on: ubuntu-latest
     steps:
@@ -51,6 +51,6 @@ jobs:
         if: always()
         uses: defenseunicorns/uds-common/.github/actions/setup@v0.3.11
       - name: Validate RHEL AMI
-        run: uds run validate-ami-rhel
+        run: uds run --no-progress validate-ami-rhel
       - name: Build RHEL AMI
-        run: uds run build-ami-rhel
+        run: uds run --no-progress build-ami-rhel

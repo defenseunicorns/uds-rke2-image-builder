@@ -31,7 +31,7 @@ jobs:
         if: always()
         uses: defenseunicorns/uds-common/.github/actions/setup@v0.3.11
       - name: Publish Ubuntu AMI
-        run: uds run publish-ami-ubuntu
+        run: uds run --no-progress publish-ami-ubuntu
   publish-rhel:
     runs-on: ubuntu-latest
     steps:
@@ -49,4 +49,4 @@ jobs:
         if: always()
         uses: defenseunicorns/uds-common/.github/actions/setup@v0.3.11
       - name: Publish RHEL AMI
-        run: uds run publish-ami-rhel
+        run: uds run --no-progress publish-ami-rhel
