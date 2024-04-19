@@ -33,30 +33,36 @@ runs:
         terraform_version: "1.5.7"
         terraform_wrapper: false
 
+    - name: Setup UDS
+      if: always()
+      uses: defenseunicorns/uds-common/.github/actions/setup@v0.3.11
+
     - name: Validate ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
-      run: make validate-ami-${{ inputs.distro }}
+      run: uds run validate-ami-${{ inputs.distro }}
 
     - name: Publish ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
-      run: make publish-ami-${{ inputs.distro }}
+      run: uds run publish-ami-${{ inputs.distro }}
 
     - name: Test ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
       env:
         SHA: ${{ github.sha }}
         DISTRO: ${{ inputs.distro }}
-      run: make test-cluster DISTRO="${{ inputs.distro }}"
+      run: uds run test-cluster
 
     - name: Teardown test infrastructure
       shell: bash -e -o pipefail {0}
       if: always()
-      run: make teardown-infra DISTRO="${{ inputs.distro }}"
+      env:
+        DISTRO: ${{ inputs.distro }}
+      run: uds run teardown-infra
 
     - name: Cleanup ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
       if: always()
-      run: make cleanup-ami
+      run: uds run cleanup-ami
 
     # Update GitHub status for successful pipeline run
     - name: "Update GitHub Status for success"

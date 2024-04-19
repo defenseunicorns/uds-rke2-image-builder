@@ -3,6 +3,18 @@ variable "ami_name" {
   description = "Name to use for the published AMI"
 }
 
+variable "ami_regions" {
+  type = list(string)
+  description = "List of regions to publish the AMI to"
+  default = []
+}
+
+variable "ami_groups" {
+  type = list(string)
+  description = "List of groups to allow access to the AMI, set to `all` for public access"
+  default = []
+}
+
 variable "timestamp" {
   type        = bool
   description = "Append a timestamp to the end of the published AMI name"

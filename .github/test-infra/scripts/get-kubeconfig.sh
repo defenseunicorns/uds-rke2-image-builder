@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Utility script that can be called from a make target after terraform has deployed the e2e test module
+# Utility script that can be called from a uds task after terraform has deployed the e2e test module
 
 echo "terraform version: $(terraform --version)"
 

@@ -1,0 +1,64 @@
+variables:
+  - name: AWS_DIR
+    default: "packer/aws"
+    description: "Directory containing AWS packer config"
+  - name: UBUNTU_PRO_TOKEN
+    default: ""
+    description: "Optional: provide Ubuntu pro token if using Ubuntu + FIPS"
+  - name: AWS_REGION
+    default: "us-west-2"
+    description: "AWS region to build the AMI in"
+
+tasks:
+  - name: publish-ami-ubuntu
+    description: "Build and Publish the Ubuntu AMI for AWS"
+    actions:
+      - cmd: |
+          cd ${AWS_DIR}
+          packer init .
+          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" .
+
+  - name: publish-ami-rhel
+    description: "Build and Publish the RHEL AMI for AWS"
+    actions:
+      - cmd: |
+          cd ${AWS_DIR}
+          packer init .
+          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" .
+
+  - name: build-ami-ubuntu
+    description: "Build the Ubuntu AMI for AWS"
+    actions:
+      - cmd: |
+          cd ${AWS_DIR}
+          packer init .
+          packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" .
+
+  - name: build-ami-rhel
+    description: "Build the RHEL AMI for AWS"
+    actions:
+      - cmd: |
+          cd ${AWS_DIR}
+          packer init .
+          packer build -var "skip_create_ami=true" --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" .
+
+  - name: fmt-ami
+    description: "Run packer fmt for the AWS AMIs"
+    actions:
+      - cmd: cd ${AWS_DIR} && packer fmt .
+
+  - name: validate-ami-ubuntu
+    description: "Run packer validation for the AWS Ubuntu AMI"
+    actions:
+      - cmd: |
+          cd ${AWS_DIR}
+          packer init .
+          packer validate --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" .
+
+  - name: validate-ami-rhel
+    description: "Run packer validation for the AWS RHEL AMI"
+    actions:
+      - cmd: |
+          cd ${AWS_DIR}
+          packer init .
+          packer validate --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" .

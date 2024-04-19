@@ -28,9 +28,9 @@ jobs:
           # 21600 seconds == 6 hours
           role-duration-seconds: 21600
       - name: Validate Ubuntu AMI
-        run: make validate-ami-ubuntu
+        run: uds run validate-ami-ubuntu
       - name: Build Ubuntu AMI
-        run: make build-ami-ubuntu
+        run: uds run build-ami-ubuntu
   test-rhel-build:
     runs-on: ubuntu-latest
     steps:
@@ -45,6 +45,6 @@ jobs:
           # 21600 seconds == 6 hours
           role-duration-seconds: 21600
       - name: Validate RHEL AMI
-        run: make validate-ami-rhel
+        run: uds run validate-ami-rhel
       - name: Build RHEL AMI
-        run: make build-ami-rhel
+        run: uds run build-ami-rhel

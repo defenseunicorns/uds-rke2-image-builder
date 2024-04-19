@@ -1,0 +1,90 @@
+includes:
+  - aws: aws.yaml
+
+variables:
+  - name: AWS_DIR
+    default: "packer/aws"
+    description: "Directory containing AWS packer config"
+  - name: E2E_TEST_DIR
+    default: ".github/test-infra"
+    description: "Directory containing e2e test infra"
+  - name: UBUNTU_PRO_TOKEN
+    default: ""
+    description: "Optional: provide Ubuntu pro token if using Ubuntu + FIPS"
+  - name: AWS_REGION
+    default: "us-west-2"
+    description: "AWS region to build the AMI in"
+  - name: DISTRO
+    description: "The distro to test with for test targets"
+  - name: SHA
+    description: "The sha to use for the state of the test infra"
+
+tasks:
+  - name: test-ami-ubuntu
+    description: "fmt, validate, and build the Ubuntu AMI for AWS."
+    actions:
+      - task: aws:fmt-ami
+      - task: aws:validate-ami-ubuntu
+      - task: aws:build-ami-ubuntu
+
+  - name: test-ami-rhel
+    description: "fmt, validate, and build the RHEL AMI for AWS."
+    actions:
+      - task: aws:fmt-ami
+      - task: aws:validate-ami-rhel
+      - task: aws:build-ami-rhel
+
+  - name: test-cluster
+    description: "Test the AMI with the baked in RKE2 startup script"
+    actions:
+      - cmd: |
+          TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
+          echo "TEST AMI: ${TEST_AMI_ID}"
+          ROOT_DIR=$(pwd)
+          cd ${E2E_TEST_DIR}/rke2-cluster
+          terraform init -force-copy \
+            -backend-config="bucket=uds-aws-ci-commercial-us-west-2-5246-tfstate" \
+            -backend-config="key=tfstate/ci/install/${SHA}-packer-${DISTRO}-rke2-startup-script.tfstate" \
+            -backend-config="region=us-west-2"
+          terraform apply -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
+          source ${ROOT_DIR}/${E2E_TEST_DIR}/scripts/get-kubeconfig.sh
+      - wait:
+          cluster:
+            kind: nodes
+            condition: Ready
+            name: kubernetes.io/os=linux # Get all nodes using a default label
+        maxTotalSeconds: 600
+      - cmd: ./uds zarf tools kubectl apply -f ${E2E_TEST_DIR}/manifests/test.yaml
+      - wait:
+          cluster:
+            kind: Pod
+            name: test-pod
+            namespace: test
+            condition: Ready
+        maxTotalSeconds: 60
+
+  - name: teardown-infra
+    description: "Destroy test infrastructure"
+    actions:
+      - cmd: |
+          TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
+          echo "TEST AMI: ${TEST_AMI_ID}"
+          cd ${E2E_TEST_DIR}/rke2-cluster
+          terraform destroy -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
+
+  - name: cleanup-ami
+    description: "Cleans up snapshots and AMIs previously published"
+    actions:
+      - cmd: |
+          TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
+          AMI_REGION=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f1)
+          echo "TEST AMI: ${TEST_AMI_ID}"
+          echo "AMI_REGION: ${AMI_REGION}"
+          snapshot_ids=$(aws ec2 describe-images --image-ids "${TEST_AMI_ID}" --region ${AMI_REGION} | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId)
+          aws ec2 deregister-image --region ${AMI_REGION} --image-id ${TEST_AMI_ID}
+          for snapshot in ${snapshot_ids}; do
+            if "${snapshot}" | grep "snap" 2>&1 1>/dev/null; then \
+              echo "Deleting snapshot: ${snapshot}"
+              aws ec2 delete-snapshot --region ${AMI_REGION} --snapshot-id "${snapshot}"
+            fi
+          done

@@ -1,0 +1,36 @@
+includes:
+  - aws: tasks/aws.yaml
+  - nutanix: tasks/nutanix.yaml
+  - test: tasks/test.yaml
+
+tasks:
+  - name: validate-ami-ubuntu
+    actions:
+      - task: aws:validate-ami-ubuntu
+  - name: validate-ami-rhel
+    actions:
+      - task: aws:validate-ami-rhel
+
+  - name: build-ami-ubuntu
+    actions:
+      - task: aws:build-ami-ubuntu
+  - name: build-ami-rhel
+    actions:
+      - task: aws:build-ami-rhel
+
+  - name: publish-ami-ubuntu
+    actions:
+      - task: aws:publish-ami-ubuntu
+  - name: publish-ami-rhel
+    actions:
+      - task: aws:publish-ami-rhel
+
+  - name: test-cluster
+    actions:
+      - task: test:test-cluster
+  - name: teardown-infra
+    actions:
+      - task: test:teardown-infra
+  - name: cleanup-ami
+    actions:
+      - task: test:cleanup-ami

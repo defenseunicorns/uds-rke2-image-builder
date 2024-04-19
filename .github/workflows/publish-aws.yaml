@@ -28,7 +28,7 @@ jobs:
           # 21600 seconds == 6 hours
           role-duration-seconds: 21600
       - name: Publish Ubuntu AMI
-        run: make publish-ami-ubuntu
+        run: uds run publish-ami-ubuntu
   publish-rhel:
     runs-on: ubuntu-latest
     steps:
@@ -43,4 +43,4 @@ jobs:
           # 21600 seconds == 6 hours
           role-duration-seconds: 21600
       - name: Publish RHEL AMI
-        run: make publish-ami-rhel
+        run: uds run publish-ami-rhel
