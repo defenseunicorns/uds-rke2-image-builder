@@ -47,17 +47,13 @@ runs:
 
     - name: Test ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
-      env:
-        SHA: ${{ github.sha }}
-        DISTRO: ${{ inputs.distro }}
-      run: uds run --no-progress test-cluster
+
+      run: uds run --no-progress test-cluster --set SHA=${{ github.sha }} --set DISTRO=${{ inputs.distro }}
 
     - name: Teardown test infrastructure
       shell: bash -e -o pipefail {0}
       if: always()
-      env:
-        DISTRO: ${{ inputs.distro }}
-      run: uds run --no-progress teardown-infra
+      run: uds run --no-progress teardown-infra --set DISTRO=${{ inputs.distro }}
 
     - name: Cleanup ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
