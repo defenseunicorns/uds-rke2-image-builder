@@ -17,7 +17,7 @@ variable "base_image_name" {
 variable "rke2_version" {
   type        = string
   description = "RKE2 version to install on the Image"
-  default     = "v1.28.6+rke2r1"
+  default     = "v1.29.3+rke2r1"
 }
 
 variable "ubuntu_pro_token" {
