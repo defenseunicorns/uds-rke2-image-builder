@@ -20,6 +20,8 @@ elif [[ $DISTRO == "ubuntu" ]]; then
   apt-get install ansible unzip jq -y
   # Install lvm2 for storage (e.x. rook/ceph)
   apt-get install lvm2 -y
+  # Keep CA Certs up to date
+  update-ca-certificates
 fi
 
 # Ensure that ansible collections needed are installed 
