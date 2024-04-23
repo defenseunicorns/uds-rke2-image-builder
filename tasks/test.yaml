@@ -40,17 +40,13 @@ tasks:
       - cmd: |
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           echo "TEST AMI: ${TEST_AMI_ID}"
-          pushd ${E2E_TEST_DIR}/rke2-cluster
+          cd ${E2E_TEST_DIR}/rke2-cluster
           terraform init -force-copy \
             -backend-config="bucket=uds-aws-ci-commercial-us-west-2-5246-tfstate" \
             -backend-config="key=tfstate/ci/install/${SHA}-packer-${DISTRO}-rke2-startup-script.tfstate" \
             -backend-config="region=us-west-2"
           terraform apply -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
-          popd && source ${E2E_TEST_DIR}/scripts/get-kubeconfig.sh
-        # Use bash for pushd/popd
-        shell: 
-          linux: "bash"
-          darwin: "bash"
+          source ../scripts/get-kubeconfig.sh
       - wait:
           cluster:
             kind: nodes
@@ -79,7 +75,6 @@ tasks:
     description: "Cleans up snapshots and AMIs previously published"
     actions:
       - cmd: |
-          set -x
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           AMI_REGION=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f1)
           echo "TEST AMI: ${TEST_AMI_ID}"
