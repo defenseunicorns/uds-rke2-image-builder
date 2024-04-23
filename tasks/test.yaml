@@ -75,6 +75,7 @@ tasks:
     description: "Cleans up snapshots and AMIs previously published"
     actions:
       - cmd: |
+          set -x
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           AMI_REGION=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f1)
           echo "TEST AMI: ${TEST_AMI_ID}"
