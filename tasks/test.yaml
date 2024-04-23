@@ -48,7 +48,7 @@ tasks:
             -backend-config="key=tfstate/ci/install/${SHA}-packer-${DISTRO}-rke2-startup-script.tfstate" \
             -backend-config="region=us-west-2"
           terraform apply -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
-          source ${root_dir}/scripts/get-kubeconfig.sh
+          source ${root_dir}/${E2E_TEST_DIR}/scripts/get-kubeconfig.sh
       - wait:
           cluster:
             kind: nodes
