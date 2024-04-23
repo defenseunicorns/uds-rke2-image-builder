@@ -38,6 +38,8 @@ tasks:
     description: "Test the AMI with the baked in RKE2 startup script"
     actions:
       - cmd: |
+          set -x
+          root_dir=$(pwd)
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           echo "TEST AMI: ${TEST_AMI_ID}"
           cd ${E2E_TEST_DIR}/rke2-cluster
@@ -46,7 +48,7 @@ tasks:
             -backend-config="key=tfstate/ci/install/${SHA}-packer-${DISTRO}-rke2-startup-script.tfstate" \
             -backend-config="region=us-west-2"
           terraform apply -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
-          source ../scripts/get-kubeconfig.sh
+          source ${root_dir}/scripts/get-kubeconfig.sh
       - wait:
           cluster:
             kind: nodes
