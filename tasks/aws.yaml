@@ -8,6 +8,12 @@ variables:
   - name: AWS_REGION
     default: "us-west-2"
     description: "AWS region to build the AMI in"
+  - name: PUBLISH_REGIONS
+    default: "[]"
+    description: "List of regions to copy the final AMI to when publishing, with escaped quotes, ex: '[\"us-west-1\"]'"
+  - name: PUBLISH_GROUPS
+    default: "[]"
+    description: "List of groups to allow access to the AMI. Only supports '[]' or '[\"all\"]'"
 
 tasks:
   - name: publish-ami-ubuntu
@@ -16,7 +22,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" .
+          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" .
 
   - name: publish-ami-rhel
     description: "Build and Publish the RHEL AMI for AWS"
@@ -24,7 +30,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" .
+          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" .
 
   - name: build-ami-ubuntu
     description: "Build the Ubuntu AMI for AWS"
