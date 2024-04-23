@@ -47,6 +47,10 @@ tasks:
             -backend-config="region=us-west-2"
           terraform apply -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
           popd && source ${E2E_TEST_DIR}/scripts/get-kubeconfig.sh
+        # Use bash for pushd/popd
+        shell: 
+          linux: "bash"
+          darwin: "bash"
       - wait:
           cluster:
             kind: nodes
@@ -83,7 +87,7 @@ tasks:
           snapshot_ids=$(aws ec2 describe-images --image-ids "${TEST_AMI_ID}" --region ${AMI_REGION} | jq -r .Images[].BlockDeviceMappings[].Ebs.SnapshotId)
           aws ec2 deregister-image --region ${AMI_REGION} --image-id ${TEST_AMI_ID}
           for snapshot in ${snapshot_ids}; do
-            if "${snapshot}" | grep "snap" 2>&1 1>/dev/null; then \
+            if echo "${snapshot}" | grep "snap" 2>&1 1>/dev/null; then \
               echo "Deleting snapshot: ${snapshot}"
               aws ec2 delete-snapshot --region ${AMI_REGION} --snapshot-id "${snapshot}"
             fi
