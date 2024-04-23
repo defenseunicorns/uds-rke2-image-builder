@@ -10,7 +10,7 @@ if [[ $DISTRO == "rhel" ]]; then
   yum install ansible unzip wget -y
   #  Install rke2 selinux policy
   wget --continue "https://github.com/rancher/rke2-selinux/releases/download/v0.17.stable.1/rke2-selinux-0.17-1.el8.noarch.rpm"
-  yum install rke2-selinux-0.14-1.el8.noarch.rpm -y
+  yum install rke2-selinux-0.17-1.el8.noarch.rpm -y
   # Install lvm2 for storage (e.x. rook/ceph)
   yum install lvm2 -y
 elif [[ $DISTRO == "ubuntu" ]]; then
