@@ -7,9 +7,9 @@ DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel
 # Pull Ansible STIGs from https://public.cyber.mil/stigs/supplemental-automation-content/
 mkdir -p /tmp/ansible && chmod 700 /tmp/ansible && cd /tmp/ansible
 if [[ $DISTRO == "rhel" ]]; then
-  curl --retry 3 --retry-connrefused -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R13_STIG_Ansible.zip
+  curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R13_STIG_Ansible.zip
 elif [[ $DISTRO == "ubuntu" ]]; then
-  curl --retry 3 --retry-connrefused -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_CAN_Ubuntu_20-04_LTS_V1R11_STIG_Ansible.zip
+  curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_CAN_Ubuntu_20-04_LTS_V1R11_STIG_Ansible.zip
 fi
 unzip ansible.zip
 unzip *-ansible.zip

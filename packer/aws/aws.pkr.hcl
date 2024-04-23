@@ -26,7 +26,7 @@ source "amazon-ebs" "base" {
   ami_name        = local.ami_name
   ami_regions     = var.ami_regions
   ami_description = "For UDS deployments on RKE2"
-  instance_type   = "t2.micro"
+  instance_type   = "t3a.medium"
   region          = var.region
   ssh_username    = var.ssh_username
   source_ami      = data.amazon-ami.base-ami.id
