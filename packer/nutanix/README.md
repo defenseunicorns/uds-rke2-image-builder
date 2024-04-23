@@ -12,7 +12,7 @@ You must already have your chosen base image(s) imported into Prism Central as a
 
 ## Setting up Variables
 
-To build on a Nutanix cluster you need to setup variables to point to your cluster and base image. An example variable file is provided in `example.pkrvars.hcl`. It is recommended to make a copy of this file and name it as `<yourname>.auto.pkrvars.hcl` so that it is automatically pulled in when running the [`uds`](https://github.com/defenseunicorns/uds-cli/blob/main/docs/runner.md) tasks. Each variable is described in `variables.pkr.hcl` file and the most common are included for reference here as well:
+To build on a Nutanix cluster you need to setup variables to point to your cluster and base image. An example variable file is provided in `example.pkrvars.hcl`. It is recommended to make a copy of this file and name it as `<yourname>.auto.pkrvars.hcl` so that it is automatically pulled in when running the [`uds` tasks](https://github.com/defenseunicorns/uds-cli/blob/main/docs/runner.md). Each variable is described in `variables.pkr.hcl` file and the most common are included for reference here as well:
 - `nutanix_username`: Username for Prism Central
 - `nutanix_password`: Password for Prism Central
 - `nutanix_endpoint`: Endpoint (URL/IP) for Prism Central
@@ -26,7 +26,7 @@ There are additional variables available as well that you may want to use in som
 
 ## Building the Image
 
-Assuming you have setup your variables in a `.auto.pkrvars.hcl` file, you should be able to use the below [`uds`](https://github.com/defenseunicorns/uds-cli/blob/main/docs/runner.md) tasks for building the image and publishing to your active Nutanix environment:
+Assuming you have setup your variables in a `.auto.pkrvars.hcl` file, you should be able to use the below [`uds` tasks](https://github.com/defenseunicorns/uds-cli/blob/main/docs/runner.md) for building the image and publishing to your active Nutanix environment:
 
 ```console
 # Build the image using your variables file

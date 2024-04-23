@@ -35,7 +35,7 @@ runs:
 
     - name: Setup UDS
       if: always()
-      uses: defenseunicorns/uds-common/.github/actions/setup@v0.3.11
+      uses: defenseunicorns/uds-common/.github/actions/setup@v0.4.0
 
     - name: Validate ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}

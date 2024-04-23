@@ -1,6 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "github>defenseunicorns/uds-common//config/renovate.json5",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)"
+  ],
+  "branchConcurrentLimit": 0,
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "packageRules": [
+    { 
+      "matchFileNames": [".github/**"],
+      "groupName": "githubactions",
+      "commitMessageTopic": "githubactions",
+      "pinDigests": true
+    }
   ]
 }

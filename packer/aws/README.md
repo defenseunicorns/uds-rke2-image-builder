@@ -17,7 +17,7 @@ To build an AMI you typically only need a few variables. All available variable 
 
 ## Building the Image
 
-Assuming you have modified the variables as needed in the `ubuntu.pkrvars.hcl` or `rhel.pkrvars.hcl` file, you should be able to use the below [`uds`](https://github.com/defenseunicorns/uds-cli/blob/main/docs/runner.md) tasks for building the AMI and publishing to your active AWS environment:
+Assuming you have modified the variables as needed in the `ubuntu.pkrvars.hcl` or `rhel.pkrvars.hcl` file, you should be able to use the below [`uds` tasks](https://github.com/defenseunicorns/uds-cli/blob/main/docs/runner.md) for building the AMI and publishing to your active AWS environment:
 
 ```console
 # Build the image using the ubuntu variables file
