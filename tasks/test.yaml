@@ -52,14 +52,20 @@ tasks:
         shell:
           darwin: "bash"
           linux: "bash"
-      - wait:
+      - env:
+        - KUBECONFIG=~/.kube/rke2-config
+        wait:
           cluster:
             kind: nodes
             condition: Ready
             name: kubernetes.io/os=linux # Get all nodes using a default label
         maxTotalSeconds: 600
-      - cmd: ./uds zarf tools kubectl apply -f ${E2E_TEST_DIR}/manifests/test.yaml
-      - wait:
+      - env:
+        - KUBECONFIG=~/.kube/rke2-config
+        cmd: ./uds zarf tools kubectl apply -f ${E2E_TEST_DIR}/manifests/test.yaml
+      - env:
+        - KUBECONFIG=~/.kube/rke2-config
+        wait:
           cluster:
             kind: Pod
             name: test-pod
