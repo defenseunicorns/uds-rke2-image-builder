@@ -26,4 +26,5 @@ sudo systemctl restart systemd-sysctl
 sudo useradd -r -c "etcd user" -s /sbin/nologin -M etcd -U
 
 # Copy temporary containerd workaround configuration
+sudo mkdir -p /var/lib/rancher/rke2/agent/etc/containerd
 sudo mv -f $file_dir/config.toml.tmpl /var/lib/rancher/rke2/agent/etc/containerd/config.toml.tmpl
