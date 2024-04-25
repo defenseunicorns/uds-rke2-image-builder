@@ -52,6 +52,9 @@ tasks:
         shell:
           darwin: "bash"
           linux: "bash"
+      - cmd: "echo ~/.kube/rke2-config"
+        setVariables:
+          - name: KUBECONFIG
       - wait:
           cluster:
             kind: nodes
@@ -70,13 +73,12 @@ tasks:
   - name: teardown-infra
     description: "Destroy test infrastructure"
     actions:
-      - env:
-        - KUBECONFIG=~/.kube/rke2-config
-        cmd: |
-          ls ~/.kube || true
-          cd && pwd
+      - cmd: "echo ~/.kube/rke2-config"
+        setVariables:
+          - name: KUBECONFIG
+      - cmd: |
           echo $KUBECONFIG
-          ./uds zarf tools kubectl get nodes --kubeconfig=~/.kube/config || true
+          ./uds zarf tools kubectl get nodes || true
           ./uds zarf tools kubectl get all -A || true
       - cmd: |
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
