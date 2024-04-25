@@ -76,6 +76,11 @@ tasks:
   - name: teardown-infra
     description: "Destroy test infrastructure"
     actions:
+      - env:
+        - KUBECONFIG=~/.kube/rke2-config
+        cmd: |
+          ./uds zarf tools kubectl get nodes || true
+          ./uds zarf tools kubectl get all -A || true
       - cmd: |
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           echo "TEST AMI: ${TEST_AMI_ID}"
