@@ -4,7 +4,7 @@ set -e
 # Setup RKE2 configuration files
 config_dir=/etc/rancher/rke2
 config_file=$config_dir/config.yaml
-stig_conf_dir=/tmp/stig-configs
+stig_conf_dir=/tmp/files
 mkdir -p $config_dir
 
 # Stage startup helper script
@@ -24,3 +24,6 @@ chown -R root:root $config_dir/default-pss.yaml
 sudo cp -f /usr/local/share/rke2/rke2-cis-sysctl.conf /etc/sysctl.d/60-rke2-cis.conf
 sudo systemctl restart systemd-sysctl
 sudo useradd -r -c "etcd user" -s /sbin/nologin -M etcd -U
+
+# Copy temporary containerd workaround configuration
+sudo mv -f /tmp/config.toml.tmpl /var/lib/rancher/rke2/agent/etc/containerd/config.toml.tmpl
