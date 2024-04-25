@@ -48,7 +48,7 @@ runs:
     - name: Test ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
 
-      run: uds run --no-progress test-cluster --set SHA=${{ github.sha }} --set DISTRO=${{ inputs.distro }}
+      run: uds run --no-progress test-cluster --set SHA=${{ github.sha }} --set DISTRO=${{ inputs.distro }} -l debug
 
     - name: Teardown test infrastructure
       shell: bash -e -o pipefail {0}

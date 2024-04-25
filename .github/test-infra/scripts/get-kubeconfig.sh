@@ -33,21 +33,3 @@ scp -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip}:/home/${
 
 # Replace the loopback address with the cluster hostname
 sed -i "s/127.0.0.1/${bootstrap_ip}/g" ~/.kube/rke2-config
-
-# find existing host record in the host file and save the line numbers
-matches_in_hosts="$(grep -n $cluster_hostname /etc/hosts | cut -f1 -d:)"
-host_entry="${bootstrap_ip} ${cluster_hostname}"
-
-# Add or update /etc/hosts file record
-if [ ! -z "$matches_in_hosts" ]
-then
-    echo "Updating existing hosts entry."
-    # iterate over the line numbers on which matches were found
-    while read -r line_number; do
-        # replace the text of each line with the desired host entry
-        sudo sed -i "${line_number}s/.*/${host_entry} /" /etc/hosts
-    done <<< "$matches_in_hosts"
-else
-    echo "Adding new hosts entry."
-    echo "$host_entry" | sudo tee -a /etc/hosts
-fi
