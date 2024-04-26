@@ -38,3 +38,16 @@ jobs:
         uses: defenseunicorns/uds-common/.github/actions/setup@v0.4.0
       - name: Publish ${{ matrix.base }} AMI
         run: uds run --no-progress publish-ami-${{ matrix.base }}
+      - name: Test ${{ matrix.base }} AMI
+        shell: bash -e -o pipefail {0}
+        env:
+          KUBECONFIG: "/home/runner/.kube/rke2-config"
+        run: uds run --no-progress test-cluster --set SHA=${{ github.sha }} --set DISTRO=${{ matrix.base }}
+      - name: Teardown test infrastructure
+        shell: bash -e -o pipefail {0}
+        if: always()
+        run: uds run --no-progress teardown-infra --set DISTRO=${{ matrix.base }}
+      - name: Cleanup ${{ matrix.base }} AMI on failure
+        shell: bash -e -o pipefail {0}
+        if: failure()
+        run: uds run --no-progress cleanup-ami
