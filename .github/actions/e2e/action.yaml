@@ -47,13 +47,14 @@ runs:
 
     - name: Test ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
-
+      env:
+        KUBECONFIG: "/home/runner/.kube/rke2-config"
       run: uds run --no-progress test-cluster --set SHA=${{ github.sha }} --set DISTRO=${{ inputs.distro }}
 
     - name: Teardown test infrastructure
       shell: bash -e -o pipefail {0}
       if: always()
-      run: uds run --no-progress teardown-infra --set DISTRO=${{ inputs.distro }} -l debug
+      run: uds run --no-progress teardown-infra --set DISTRO=${{ inputs.distro }}
 
     - name: Cleanup ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
