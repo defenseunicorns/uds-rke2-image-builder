@@ -38,7 +38,6 @@ tasks:
     description: "Test the AMI with the baked in RKE2 startup script"
     actions:
       - cmd: |
-          set -x
           root_dir=$(pwd)
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           echo "TEST AMI: ${TEST_AMI_ID}"
