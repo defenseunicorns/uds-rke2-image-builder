@@ -36,6 +36,11 @@ jobs:
       - name: Setup UDS
         if: always()
         uses: defenseunicorns/uds-common/.github/actions/setup@v0.4.0
+      - name: Setup Tofu
+        uses: opentofu/setup-opentofu@ae80d4ecaab946d8f5ff18397fbf6d0686c6d46a # v1.0.3
+        with:
+          tofu_wrapper: false
+          tofu_version: 1.6.2
       - name: Publish ${{ matrix.base }} AMI
         run: uds run --no-progress publish-ami-${{ matrix.base }}
       - name: Test ${{ matrix.base }} AMI
