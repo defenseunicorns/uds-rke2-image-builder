@@ -101,7 +101,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "../stig-configs"
+    source      = "../files"
     destination = "/tmp"
   }
 

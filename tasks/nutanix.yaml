@@ -1,0 +1,37 @@
+variables:
+  - name: NUTANIX_DIR
+    default: "packer/nutanix"
+    description: "Directory containing Nutanix packer config"
+  - name: UBUNTU_PRO_TOKEN
+    default: ""
+    description: "Optional: provide Ubuntu pro token if using Ubuntu + FIPS"
+
+tasks:
+  - name: publish-nutanix
+    description: "Build and Publish the Nutanix Image"
+    actions:
+      - cmd: |
+          cd ${NUTANIX_DIR}
+          packer init .
+          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" .
+
+  - name: build-nutanix
+    description: "Build the Nutanix Image"
+    actions:
+      - cmd: |
+          cd ${NUTANIX_DIR}
+          packer init .
+          packer build -var "image_delete=true" -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" .
+
+  - name: fmt-nutanix
+    description: "Run packer fmt for the Nutanix Image"
+    actions:
+      - cmd: cd ${NUTANIX_DIR} && packer fmt .
+
+  - name: validate-nutanix
+    description: "Run packer validation for the Nutanix Image"
+    actions:
+      - cmd: |
+          cd ${NUTANIX_DIR}
+          packer init .
+          packer validate .

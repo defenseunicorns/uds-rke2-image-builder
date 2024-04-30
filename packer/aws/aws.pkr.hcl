@@ -24,12 +24,13 @@ data "amazon-ami" "base-ami" {
 
 source "amazon-ebs" "base" {
   ami_name        = local.ami_name
+  ami_regions     = var.ami_regions
   ami_description = "For UDS deployments on RKE2"
   instance_type   = "t2.micro"
   region          = var.region
   ssh_username    = var.ssh_username
   source_ami      = data.amazon-ami.base-ami.id
-
+  ami_groups      = var.ami_groups
   skip_create_ami = var.skip_create_ami
 }
 
@@ -90,7 +91,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "../stig-configs"
+    source      = "../files"
     destination = "/tmp"
   }
 
