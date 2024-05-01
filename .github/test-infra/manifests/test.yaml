@@ -13,6 +13,6 @@ metadata:
 spec:
   containers:
     - name: test-container
-      image: ghcr.io/stefanprodan/podinfo:6.5.0
+      image: ghcr.io/stefanprodan/podinfo:6.6.2@sha256:4aa3b819f4cafc97d03d902ed17cbec076e2beee02d53b67ff88527124086fd9
       command:
         - ./podinfo
