@@ -1,20 +1,20 @@
 #!/bin/bash
 
-# Utility script that can be called from a uds task after terraform has deployed the e2e test module
+# Utility script that can be called from a uds task after tofu has deployed the e2e test module
 
-echo "terraform version: $(terraform --version)"
+echo "tofu version: $(tofu --version)"
 
-# Get required outputs from terraform
-terraform output -raw private_key > key.pem
+# Get required outputs from tofu
+tofu output -raw private_key > key.pem
 chmod 600 key.pem
 
-bootstrap_ip=$(terraform output -raw bootstrap_ip)
+bootstrap_ip=$(tofu output -raw bootstrap_ip)
 echo "bootstrap_ip: ${bootstrap_ip}"
 
-node_user=$(terraform output -raw node_user)
+node_user=$(tofu output -raw node_user)
 echo "node_user: ${node_user}"
 
-cluster_hostname=$(terraform output -raw cluster_hostname)
+cluster_hostname=$(tofu output -raw cluster_hostname)
 echo "cluster_hostname: ${cluster_hostname}"
 
 # Try ssh up to 10 times waiting 15 seconds between tries
