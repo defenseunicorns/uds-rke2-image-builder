@@ -7,12 +7,10 @@ DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel
 # Install dependencies and cli tools needed by other packer scripts
 if [[ $DISTRO == "rhel" ]]; then
   yum update -y && yum upgrade -y
-  yum install ansible unzip -y
+  yum install ansible unzip nfs-utils nfs4-acl-tools lvm2 iscsi-initiator-utils -y
   #  Install rke2 selinux policy
   curl -LO "https://github.com/rancher/rke2-selinux/releases/download/v0.17.stable.1/rke2-selinux-0.17-1.el8.noarch.rpm"
   yum install rke2-selinux-0.17-1.el8.noarch.rpm -y
-  # Install lvm2 for storage (e.x. rook/ceph)
-  yum install lvm2 -y
 elif [[ $DISTRO == "ubuntu" ]]; then
   echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
   apt-add-repository ppa:ansible/ansible -y
