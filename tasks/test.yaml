@@ -42,11 +42,11 @@ tasks:
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           echo "TEST AMI: ${TEST_AMI_ID}"
           cd ${E2E_TEST_DIR}/rke2-cluster
-          terraform init -force-copy \
+          tofu init -force-copy \
             -backend-config="bucket=uds-aws-ci-commercial-us-west-2-5246-tfstate" \
             -backend-config="key=tfstate/ci/install/${SHA}-packer-${DISTRO}-rke2-startup-script.tfstate" \
             -backend-config="region=us-west-2"
-          terraform apply -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
+          tofu apply -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
           source ${root_dir}/${E2E_TEST_DIR}/scripts/get-kubeconfig.sh
         shell:
           darwin: "bash"
@@ -73,7 +73,7 @@ tasks:
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           echo "TEST AMI: ${TEST_AMI_ID}"
           cd ${E2E_TEST_DIR}/rke2-cluster
-          terraform destroy -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
+          tofu destroy -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
 
   - name: cleanup-ami
     description: "Cleans up snapshots and AMIs previously published"

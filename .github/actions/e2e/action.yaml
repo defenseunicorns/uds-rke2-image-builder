@@ -15,7 +15,7 @@ runs:
   steps:
   # Update GitHub status for pending pipeline run
     - name: "Update GitHub Status for pending"
-      uses: docker://cloudposse/github-status-updater
+      uses: docker://cloudposse/github-status-updater@sha256:3f9e7d4539ac4566dfdadb39d70d8101303df47eb13c3d7b43a32c15fc6f5bcc
       with:
         args: "-action update_state -state pending -ref ${{ env.REPO_SHA }} -repo ${{ env.REPO_NAME }}"
       env:
@@ -28,10 +28,15 @@ runs:
         GITHUB_REF: ${{ github.event.client_payload.pull_request.head.ref || github.ref_name }}
         GITHUB_OWNER: ${{ github.event.client_payload.github.payload.repository.owner.login || github.repository_owner }}
 
-    - uses: hashicorp/setup-terraform@v3
+    - name: Setup Tofu
+      uses: opentofu/setup-opentofu@ae80d4ecaab946d8f5ff18397fbf6d0686c6d46a # v1.0.3
       with:
-        terraform_version: "1.5.7"
-        terraform_wrapper: false
+        tofu_wrapper: false
+        tofu_version: 1.6.2
+
+    - name: Setup UDS
+      if: always()
+      uses: defenseunicorns/uds-common/.github/actions/setup@a6fba9c0084319325d70816a3481aec0979649fa # v0.4.0
 
     - name: Setup UDS
       if: always()
@@ -64,7 +69,7 @@ runs:
     # Update GitHub status for successful pipeline run
     - name: "Update GitHub Status for success"
       if: ${{ success() }}
-      uses: docker://cloudposse/github-status-updater
+      uses: docker://cloudposse/github-status-updater@sha256:3f9e7d4539ac4566dfdadb39d70d8101303df47eb13c3d7b43a32c15fc6f5bcc
       with:
         args: "-action update_state -state success -ref ${{ env.REPO_SHA }} -repo ${{ env.REPO_NAME }}"
       env:
@@ -80,7 +85,7 @@ runs:
     # Update GitHub status for failing pipeline run
     - name: "Update GitHub Status for failure"
       if: ${{ failure() }}
-      uses: docker://cloudposse/github-status-updater
+      uses: docker://cloudposse/github-status-updater@sha256:3f9e7d4539ac4566dfdadb39d70d8101303df47eb13c3d7b43a32c15fc6f5bcc
       with:
         args: "-action update_state -state failure -ref ${{ env.REPO_SHA }} -repo ${{ env.REPO_NAME }}"
       env:
@@ -96,7 +101,7 @@ runs:
     # Update GitHub status for cancelled pipeline run
     - name: "Update GitHub Status for cancelled"
       if: ${{ cancelled() }}
-      uses: docker://cloudposse/github-status-updater
+      uses: docker://cloudposse/github-status-updater@sha256:3f9e7d4539ac4566dfdadb39d70d8101303df47eb13c3d7b43a32c15fc6f5bcc
       with:
         args: "-action update_state -state error -ref ${{ env.REPO_SHA }} -repo ${{ env.REPO_NAME }}"
       env:

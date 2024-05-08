@@ -24,9 +24,9 @@ jobs:
         aws_env: ["commercial"]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
         with:
           role-to-assume: ${{ secrets.AWS_COMMERCIAL_ORG_ROLE_TO_ASSUME }}
           role-session-name: ${{ github.job || github.event.client_payload.pull_request.head.sha || github.sha }}
@@ -35,7 +35,12 @@ jobs:
           role-duration-seconds: 21600
       - name: Setup UDS
         if: always()
-        uses: defenseunicorns/uds-common/.github/actions/setup@v0.4.0
+        uses: defenseunicorns/uds-common/.github/actions/setup@a6fba9c0084319325d70816a3481aec0979649fa # v0.4.0
+      - name: Setup Tofu
+        uses: opentofu/setup-opentofu@ae80d4ecaab946d8f5ff18397fbf6d0686c6d46a # v1.0.3
+        with:
+          tofu_wrapper: false
+          tofu_version: 1.6.2
       - name: Publish ${{ matrix.base }} AMI
         run: uds run --no-progress publish-ami-${{ matrix.base }}
       - name: Test ${{ matrix.base }} AMI
