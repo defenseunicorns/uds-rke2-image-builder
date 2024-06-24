@@ -1,4 +1,4 @@
-variable "vsphere_user" {
+variable "vsphere_username" {
   sensitive   = true
   type        = string
   description = "User used to authenticate with vSphere API"
@@ -56,6 +56,12 @@ variable "uds_packer_vm_shutdown_timeout" {
   type = string
   default = "7m"
   description = "Amount of time to wait for the Packer VM to shut down after the build is complete."
+}
+
+variable "uds_packer_vm_shutdown_command" {
+  type = string
+  default = ""
+  description = "Shut down command after the build is complete."
 }
 
 variable "http_directory" {
@@ -202,6 +208,12 @@ variable "uds_content_library_item_name" {
   description = "Name for the item published to the vSphere content library"
 }
 
+variable "root_password" {
+  type = string
+  description = "Password to set for the root user on boot"
+  sensitive   = true
+}
+
 variable "packer_ssh_username" {
   type        = string
   description = "The username to login to the guest operating system."
@@ -214,8 +226,33 @@ variable "packer_ssh_password" {
   sensitive   = true
 }
 
+variable "rhsm_username" {
+  type        = string
+  description = "The username to register with Redhat Subscription Manager"
+  sensitive   = true
+}
+
+variable "rhsm_password" {
+  type        = string
+  description = "The password to register with Redhat Subscription Manager"
+  sensitive   = true
+}
+
 variable "vm_disk_controller_type" {
   type = list(string)
   default = ["pvscsi"]
   description = "Determines the type(s), in sequence, of disk controllers used"
+}
+
+variable "rke2_version" {
+  type        = string
+  description = "RKE2 version to install on the Image"
+  default     = "v1.29.3+rke2r1"
+}
+
+variable "ubuntu_pro_token" {
+  type        = string
+  description = "Token for a valid Ubuntu Pro subscription to use for FIPS packages"
+  default     = ""
+  sensitive   = true
 }
