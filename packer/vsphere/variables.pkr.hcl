@@ -226,6 +226,18 @@ variable "packer_ssh_password" {
   sensitive   = true
 }
 
+variable "persistent_admin_username" {
+  type        = string
+  description = "The username to login to the guest operating system."
+  sensitive   = true
+}
+
+variable "persistent_admin_password" {
+  type        = string
+  description = "The password to login to the guest operating system."
+  sensitive   = true
+}
+
 variable "rhsm_username" {
   type        = string
   description = "The username to register with Redhat Subscription Manager"

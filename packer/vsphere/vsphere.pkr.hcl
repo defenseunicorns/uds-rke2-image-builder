@@ -22,6 +22,8 @@ locals {
       packer_ssh_username = var.packer_ssh_username
       rhsm_username = var.rhsm_username
       rhsm_password = var.rhsm_password
+      persistent_admin_username = var.persistent_admin_username
+      persistent_admin_password = bcrypt(var.persistent_admin_password)
     })
   }
 }
