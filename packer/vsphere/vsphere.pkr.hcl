@@ -13,7 +13,7 @@ packer {
 }
 
 locals {
-  vm_name = "${var.uds_packer_vm_name}_${var.k8s_distro}_${var.k8s_node_role}"
+  vm_name = "${var.uds_packer_vm_name}_${var.k8s_distro}"
   uds_content_library_item_description = var.uds_content_library_item_description != null ? var.uds_content_library_item_description : local.vm_name
   shutdown_command = var.uds_packer_vm_shutdown_command == "" ? "sudo su -c \"userdel -rf ${var.packer_ssh_username}; shutdown -P now\"" : var.uds_packer_vm_shutdown_command 
   http_content = {
@@ -94,6 +94,7 @@ source "vsphere-iso" "rke2-rhel-base" {
     name = var.uds_content_library_item_name != null ? var.uds_content_library_item_name : "${local.vm_name}-${formatdate("DD-MM-YYYY_hh-mm-ss",timestamp())}"
     description = local.uds_content_library_item_description
     ovf = true
+    skip_import = var.skip_import
     destroy = true
   }
 
@@ -161,5 +162,16 @@ build {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/rke2-config.sh"
     timeout         = "15m"
+  }
+
+  post-processors {
+    post-processor "vsphere-template" {
+      host                = var.vsphere_server
+      insecure            = var.allow_unverified_ssl
+      username            = var.vsphere_username
+      password            = var.vsphere_password
+      datacenter          = var.uds_datacenter_name
+      folder              = var.uds_packer_folder_name
+    }
   }
 }
