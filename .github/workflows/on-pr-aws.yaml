@@ -22,7 +22,7 @@ jobs:
         aws_env: ["commercial"]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
         with:
@@ -33,7 +33,7 @@ jobs:
           role-duration-seconds: 21600
       - name: Setup UDS
         if: always()
-        uses: defenseunicorns/uds-common/.github/actions/setup@a6fba9c0084319325d70816a3481aec0979649fa # v0.4.0
+        uses: defenseunicorns/uds-common/.github/actions/setup@b887451af5bc7edb3f1b040349a3405b018fe48a # v0.7.0
       - name: Validate ${{ matrix.base }} AMI
         run: uds run --no-progress validate-ami-${{ matrix.base }}
       - name: Build ${{ matrix.base }} AMI
