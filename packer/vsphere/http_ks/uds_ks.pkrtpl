@@ -1,7 +1,7 @@
 lang en_US
 keyboard --xlayouts='us'
 timezone America/New_York --utc
-rootpw ${root_password} --iscrypted --allow-ssh # default password is changeme
+rootpw ${root_password} --iscrypted --allow-ssh
 authselect select minimal --force
 reboot
 text
@@ -32,7 +32,6 @@ dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarc
 dnf makecache
 dnf install -y sudo open-vm-tools perl
 
-echo "${packer_ssh_username} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${packer_ssh_username}
 echo "${persistent_admin_username} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${persistent_admin_username}
 sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
 %end

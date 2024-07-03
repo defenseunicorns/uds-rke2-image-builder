@@ -15,11 +15,10 @@ packer {
 locals {
   vm_name = "${var.uds_packer_vm_name}_${var.k8s_distro}"
   uds_content_library_item_description = var.uds_content_library_item_description != null ? var.uds_content_library_item_description : local.vm_name
-  shutdown_command = var.uds_packer_vm_shutdown_command == "" ? "sudo su -c \"userdel -rf ${var.packer_ssh_username}; shutdown -P now\"" : var.uds_packer_vm_shutdown_command 
+  shutdown_command = var.uds_packer_vm_shutdown_command == "" ? "sudo su -c \"shutdown -P now\"" : var.uds_packer_vm_shutdown_command 
   http_content = {
     "/uds.ks" = templatefile("${abspath(path.root)}/http_ks/uds_ks.pkrtpl", { 
       root_password = bcrypt(var.root_password) 
-      packer_ssh_username = var.packer_ssh_username
       rhsm_username = var.rhsm_username
       rhsm_password = var.rhsm_password
       persistent_admin_username = var.persistent_admin_username
@@ -100,8 +99,8 @@ source "vsphere-iso" "rke2-rhel-base" {
 
   # Communicator
   communicator = "ssh"
-  ssh_username = var.packer_ssh_username
-  ssh_password = var.packer_ssh_password  
+  ssh_username = "root"
+  ssh_password = var.root_password 
 }
 
 build {
@@ -159,6 +158,9 @@ build {
   }
 
   provisioner "shell" {
+    environment_vars = [
+      "RKE2_STARTUP_DIR=/opt"
+    ]
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/rke2-config.sh"
     timeout         = "15m"
