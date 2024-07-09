@@ -72,7 +72,15 @@ variable "http_directory" {
 
 variable "boot_command" {
   type = list(string)
-  default = ["<up>","<tab>","<spacebar>","inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/uds.ks", "<enter>"]
+  default = [
+    "<up>",
+    "<tab>",
+    "<spacebar>",
+    "inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/uds.ks",
+    "<spacebar>",
+    "fips=1",
+    "<enter>"
+  ]
   description = "Boot command to execute on the build VM"
 }
 
