@@ -12,7 +12,7 @@ variable "vsphere_password" {
 
 variable "vsphere_server" {
   type        = string
-  default     = "192.168.10.11"
+  default     = "192.168.0.11"
   description = "FQDN or IP of the vSphere API"
 }
 
@@ -209,18 +209,6 @@ variable "uds_content_library_item_name" {
 variable "root_password" {
   type = string
   description = "Password to set for the root user on boot"
-  sensitive   = true
-}
-
-variable "packer_ssh_username" {
-  type        = string
-  description = "The username to login to the guest operating system."
-  sensitive   = true
-}
-
-variable "packer_ssh_password" {
-  type        = string
-  description = "The password to login to the guest operating system."
   sensitive   = true
 }
 
