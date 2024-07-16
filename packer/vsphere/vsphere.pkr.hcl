@@ -24,16 +24,16 @@ locals {
       persistent_admin_username = var.persistent_admin_username
       persistent_admin_password = bcrypt(var.persistent_admin_password)
     })
-    "cloud-init/user-data.tpl" = templatefile("${abspath(path.root)}/http/uds_user_data.pkrtpl", { 
+    "/cloud-init/user-data.tpl" = templatefile("${abspath(path.root)}/http/uds_user_data.pkrtpl", { 
       root_password = bcrypt(var.root_password) 
       persistent_admin_username = var.persistent_admin_username
       persistent_admin_password = bcrypt(var.persistent_admin_password)
     })
-    "cloud-init/metadata-data" = templatefile("${abspath(path.root)}/http/uds_meta_data.pkrtpl", {})
+    "/cloud-init/metadata-data" = templatefile("${abspath(path.root)}/http/uds_meta_data.pkrtpl", {})
   }
 }
 
-source "vsphere-iso" "rke2-rhel-base" {
+source "vsphere-iso" "rke2-base" {
   # vSphere connection
   vcenter_server      = var.vsphere_server
   username            = var.vsphere_username
@@ -111,7 +111,7 @@ source "vsphere-iso" "rke2-rhel-base" {
 
 build {
 
-  sources = ["source.vsphere-iso.rke2-rhel-base"]
+  sources = ["source.vsphere-iso.rke2-base"]
 
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"

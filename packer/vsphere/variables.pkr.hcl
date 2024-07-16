@@ -70,7 +70,7 @@ variable "http_directory" {
   description = "Name of the local directory containing the kickstart file to be used for booting the UDS nodes"
 }
 
-variable "rhel_boot_command" {
+variable "ubuntu_boot_command" {
   type = list(string)
   default = [
     "e<wait><down><down><down><end>",
@@ -204,7 +204,7 @@ variable "linux_distro" {
   default = "rhel"
   validation {
     condition = contains(["rhel", "ubuntu"], var.linux_distro)
-    error_message = "Must be either 'rhel' or 'ubuntu'"
+    error_message = "Must be either 'rhel' or 'ubuntu'."
   }
   description = "The Linux distribution used as the image base OS"
 }
