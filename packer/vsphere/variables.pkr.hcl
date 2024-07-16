@@ -66,11 +66,22 @@ variable "uds_packer_vm_shutdown_command" {
 
 variable "http_directory" {
   type = string
-  default = "http_ks"
+  default = "http"
   description = "Name of the local directory containing the kickstart file to be used for booting the UDS nodes"
 }
 
-variable "boot_command" {
+variable "rhel_boot_command" {
+  type = list(string)
+  default = [
+    "e<wait><down><down><down><end>",
+    "<space>",
+    "autoinstall 'ds=nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/'",
+    "<wait><F10><wait>"
+  ]
+  description = "Boot command to execute on Ubuntu build VM"
+}
+
+variable "rhel_boot_command" {
   type = list(string)
   default = [
     "<up>",
@@ -81,7 +92,7 @@ variable "boot_command" {
     "fips=1",
     "<enter>"
   ]
-  description = "Boot command to execute on the build VM"
+  description = "Boot command to execute on RHEL build VM"
 }
 
 variable "http_ip" {
@@ -186,6 +197,16 @@ variable "k8s_distro" {
   type = string
   default = "rke2"
   description = "The Kubernetes distribution being installed"
+}
+
+variable "linux_distro" {
+  type = string
+  default = "rhel"
+  validation {
+    condition = contains(["rhel", "ubuntu"], var.linux_distro)
+    error_message = "Must be either 'rhel' or 'ubuntu'"
+  }
+  description = "The Linux distribution used as the image base OS"
 }
 
 variable "uds_packer_vm_name" {
