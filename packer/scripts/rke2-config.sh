@@ -23,7 +23,9 @@ mv -f $file_dir/default-pss.yaml $config_dir/default-pss.yaml
 chown -R root:root $config_dir/default-pss.yaml
 
 # Run restorecon to re-label files moved from /tmp
-restorecon -R $config_dir
+if [[ $( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq ) == "rhel" ]]; then
+  restorecon -R $config_dir
+fi
 
 # Configure settings needed by CIS profile and add etcd user
 sudo cp -f /usr/local/share/rke2/rke2-cis-sysctl.conf /etc/sysctl.d/60-rke2-cis.conf
