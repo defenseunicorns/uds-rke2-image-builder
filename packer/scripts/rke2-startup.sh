@@ -53,7 +53,7 @@ fi
 # Ensure file permissions match STIG rules - https://www.stigviewer.com/stig/rancher_government_solutions_rke2/2022-10-13/finding/V-254564
 echo "Fixing RKE2 file permissions for STIG"
 dir=/etc/rancher/rke2
-chmod -R 0600 $dir/*
+chmod -R 0640 $dir/*
 chown -R root:root $dir/*
 
 dir=/var/lib/rancher/rke2
@@ -77,11 +77,14 @@ chmod 0750 $dir
 chown root:root $dir/*
 chmod 0640 $dir/*
 
-dir=/var/lib/rancher/rke2/server
-chown root:root $dir/*
-chmod 0700 $dir/cred
-chmod 0700 $dir/db
-chmod 0700 $dir/tls
-chmod 0751 $dir/manifests
-chmod 0750 $dir/logs
-chmod 0600 $dir/token
+# Skip these if not running as a server
+if [ -z $agent ]; then
+  dir=/var/lib/rancher/rke2/server
+  chown root:root $dir/*
+  chmod 0700 $dir/cred
+  chmod 0700 $dir/db
+  chmod 0700 $dir/tls
+  chmod 0751 $dir/manifests
+  chmod 0750 $dir/logs
+  chmod 0600 $dir/token
+fi

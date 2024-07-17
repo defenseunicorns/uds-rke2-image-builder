@@ -1,0 +1,39 @@
+lang en_US
+keyboard --xlayouts='us'
+timezone America/New_York --utc
+rootpw ${root_password} --iscrypted --allow-ssh
+authselect select minimal --force
+reboot
+text
+cdrom
+eula --agreed
+bootloader --append="rhgb quiet crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M"
+zerombr
+clearpart --all --initlabel
+autopart
+network --bootproto=dhcp
+skipx
+firstboot --disable
+selinux --enforcing
+firewall --enabled --ssh
+user --name=${persistent_admin_username} --password=${persistent_admin_password} --iscrypted --groups="wheel"
+%packages
+@^minimal-environment
+@network-tools
+@hardware-monitoring
+@standard
+%end
+
+%post --log=/root/ks-post.log
+/usr/sbin/subscription-manager register --username ${rhsm_username} --password ${rhsm_password} --autosubscribe --force
+/usr/sbin/subscription-manager repos --enable "ansible-automation-platform-2.2-for-rhel-9-x86_64-rpms"
+/usr/sbin/subscription-manager repos --enable "codeready-builder-for-rhel-9-x86_64-rpms"
+dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+dnf makecache
+dnf install -y sudo open-vm-tools perl
+
+echo "${persistent_admin_username} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/${persistent_admin_username}
+sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
+%end
+
+reboot --eject
