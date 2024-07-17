@@ -24,12 +24,12 @@ locals {
       persistent_admin_username = var.persistent_admin_username
       persistent_admin_password = bcrypt(var.persistent_admin_password)
     })
-    "/cloud-init/user-data.tpl" = templatefile("${abspath(path.root)}/http/uds_user_data.pkrtpl", { 
+    "/cloud-init/user-data" = templatefile("${abspath(path.root)}/http/uds_user_data.pkrtpl", { 
       root_password = bcrypt(var.root_password) 
       persistent_admin_username = var.persistent_admin_username
       persistent_admin_password = bcrypt(var.persistent_admin_password)
     })
-    "/cloud-init/metadata-data" = templatefile("${abspath(path.root)}/http/uds_meta_data.pkrtpl", {})
+    "/cloud-init/meta-data" = templatefile("${abspath(path.root)}/http/uds_meta_data.pkrtpl", {})
   }
 }
 
@@ -106,6 +106,7 @@ source "vsphere-iso" "rke2-base" {
   # Communicator
   communicator = "ssh"
   ssh_username = "root"
+  ssh_timeout  = var.ssh_timeout
   ssh_password = var.root_password 
 }
 
