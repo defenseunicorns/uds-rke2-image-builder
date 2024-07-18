@@ -172,6 +172,12 @@ build {
     script          = "../scripts/rke2-config.sh"
     timeout         = "15m"
   }
+  
+  provisioner "shell" {
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    script          = "../scripts/cleanup-cloud-init.sh"
+    timeout         = "15m"
+  }
 
   post-processors {
     post-processor "vsphere-template" {
