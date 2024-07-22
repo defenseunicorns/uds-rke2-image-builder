@@ -15,17 +15,17 @@ packer {
 locals {
   vm_name = "${var.uds_packer_vm_name}_${var.linux_distro}_${var.k8s_distro}"
   uds_content_library_item_description = var.uds_content_library_item_description != null ? var.uds_content_library_item_description : local.vm_name
-  shutdown_command = var.uds_packer_vm_shutdown_command == "" ? "sudo su -c \"shutdown -P now\"" : var.uds_packer_vm_shutdown_command 
+  shutdown_command = var.uds_packer_vm_shutdown_command == "" ? "sudo su -c \"shutdown -P now\"" : var.uds_packer_vm_shutdown_command
   http_content = {
-    "/uds.ks" = templatefile("${abspath(path.root)}/http/uds_ks.pkrtpl", { 
-      root_password = bcrypt(var.root_password) 
+    "/uds.ks" = templatefile("${abspath(path.root)}/http/uds_ks.pkrtpl", {
+      root_password = bcrypt(var.root_password)
       rhsm_username = var.rhsm_username
       rhsm_password = var.rhsm_password
       persistent_admin_username = var.persistent_admin_username
       persistent_admin_password = bcrypt(var.persistent_admin_password)
     })
-    "/cloud-init/user-data" = templatefile("${abspath(path.root)}/http/uds_user_data.pkrtpl", { 
-      root_password = bcrypt(var.root_password) 
+    "/cloud-init/user-data" = templatefile("${abspath(path.root)}/http/uds_user_data.pkrtpl", {
+      root_password = bcrypt(var.root_password)
       persistent_admin_username = var.persistent_admin_username
       persistent_admin_password = bcrypt(var.persistent_admin_password)
     })
@@ -74,12 +74,12 @@ source "vsphere-iso" "rke2-base" {
   # Temporary VM guest OS
   iso_paths = ["${var.uds_content_library_name}/${var.uds_iso_filepath}"]
   guest_os_type = var.uds_os_type
-  
+
   # Temporary VM boot configuration
   boot_command = var.linux_distro == "ubuntu" ? var.ubuntu_boot_command : var.rhel_boot_command
   http_content = local.http_content
-  http_ip = var.http_ip != null ? var.http_ip : "" 
-  
+  http_ip = var.http_ip != null ? var.http_ip : ""
+
   # Temporary VM shutdown configuration
   shutdown_timeout = var.uds_packer_vm_shutdown_timeout
   shutdown_command = local.shutdown_command
@@ -107,7 +107,7 @@ source "vsphere-iso" "rke2-base" {
   communicator = "ssh"
   ssh_username = "root"
   ssh_timeout  = var.ssh_timeout
-  ssh_password = var.root_password 
+  ssh_password = var.root_password
 }
 
 build {
@@ -172,7 +172,7 @@ build {
     script          = "../scripts/rke2-config.sh"
     timeout         = "15m"
   }
-  
+
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/cleanup-cloud-init.sh"

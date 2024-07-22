@@ -177,7 +177,7 @@ variable "vm_disk_configurations" {
     }
   ))
   default = [{
-    disk_size      = 20000
+    disk_size      = 50000
     disk_controller_index = 0
     disk_thin_provisioned = false
     disk_eagerly_scrub = false
@@ -246,12 +246,14 @@ variable "persistent_admin_password" {
 
 variable "rhsm_username" {
   type        = string
+  default     = "unused_default"
   description = "The username to register with Redhat Subscription Manager"
   sensitive   = true
 }
 
 variable "rhsm_password" {
   type        = string
+  default     = "unused_default"
   description = "The password to register with Redhat Subscription Manager"
   sensitive   = true
 }
