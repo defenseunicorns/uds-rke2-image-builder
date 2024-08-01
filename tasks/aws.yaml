@@ -25,7 +25,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "rke2_version=${RKE2_VERSION}".
+          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "rke2_version=${RKE2_VERSION}" .
 
   - name: publish-ami-rhel
     description: "Build and Publish the RHEL AMI for AWS"
@@ -33,7 +33,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "rke2_version=${RKE2_VERSION}".
+          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "rke2_version=${RKE2_VERSION}" .
 
   - name: build-ami-ubuntu
     description: "Build the Ubuntu AMI for AWS"
@@ -41,7 +41,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "rke2_version=${RKE2_VERSION}".
+          packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "rke2_version=${RKE2_VERSION}" .
 
   - name: build-ami-rhel
     description: "Build the RHEL AMI for AWS"
