@@ -14,6 +14,9 @@ variables:
   - name: PUBLISH_GROUPS
     default: "[]"
     description: "List of groups to allow access to the AMI. Only supports '[]' or '[\"all\"]'"
+  - name: RKE2_VERSION
+    default: "v1.29.6+rke2r1"
+    description: "RKE2 version to build the AMI with"
 
 tasks:
   - name: publish-ami-ubuntu
@@ -22,7 +25,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" .
+          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "rke2_version=${RKE2_VERSION}".
 
   - name: publish-ami-rhel
     description: "Build and Publish the RHEL AMI for AWS"
@@ -30,7 +33,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" .
+          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "rke2_version=${RKE2_VERSION}".
 
   - name: build-ami-ubuntu
     description: "Build the Ubuntu AMI for AWS"
@@ -38,7 +41,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" .
+          packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "rke2_version=${RKE2_VERSION}".
 
   - name: build-ami-rhel
     description: "Build the RHEL AMI for AWS"
@@ -46,7 +49,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build -var "skip_create_ami=true" --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" .
+          packer build -var "skip_create_ami=true" --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "rke2_version=${RKE2_VERSION}" .
 
   - name: fmt-ami
     description: "Run packer fmt for the AWS AMIs"
@@ -59,7 +62,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer validate --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" .
+          packer validate --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "rke2_version=${RKE2_VERSION}" .
 
   - name: validate-ami-rhel
     description: "Run packer validation for the AWS RHEL AMI"
@@ -67,4 +70,4 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer validate --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" .
+          packer validate --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "rke2_version=${RKE2_VERSION}" .

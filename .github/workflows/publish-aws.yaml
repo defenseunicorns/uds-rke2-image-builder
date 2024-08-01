@@ -21,6 +21,8 @@ jobs:
     strategy:
       matrix:
         base: ["ubuntu", "rhel"]
+        # TODO: Can we add a renovate config for these?
+        rke2_version: ["v1.28.11+rke2r1", "v1.29.6+rke2r1", "v1.30.2+rke2r1"]
         aws_env: ["commercial"]
     steps:
       - name: Checkout Code
@@ -42,7 +44,7 @@ jobs:
           tofu_wrapper: false
           tofu_version: 1.6.2
       - name: Publish ${{ matrix.base }} AMI
-        run: uds run --no-progress publish-ami-${{ matrix.base }}
+        run: uds run --no-progress publish-ami-${{ matrix.base }} --set RKE2_VERSION=${{ matrix.rke2_version }}
       - name: Test ${{ matrix.base }} AMI
         shell: bash -e -o pipefail {0}
         env:
