@@ -72,7 +72,6 @@ jobs:
     if: ${{ needs.parse.outputs.test-distros != '' }}
     strategy:
       matrix:
-        # TODO: Do we want to run e2e for all combinations of distros and rke versions?
         test-distros: ${{ fromJson(needs.parse.outputs.test-distros) }}
       fail-fast: false
 
