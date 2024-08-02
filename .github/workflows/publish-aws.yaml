@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         base: ["ubuntu", "rhel"]
-        rke2_version: ["v1.28.10+rke2r1", "v1.29.0+rke2r1", "v1.30.0+rke2r1"]
+        rke2_version: ["v1.28.11+rke2r1", "v1.29.6+rke2r1", "v1.30.2+rke2r1"]
         aws_env: ["commercial"]
     steps:
       - name: Checkout Code
