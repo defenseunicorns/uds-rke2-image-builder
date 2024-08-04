@@ -45,6 +45,6 @@ jobs:
         if: always()
         uses: defenseunicorns/uds-common/.github/actions/setup@a6fba9c0084319325d70816a3481aec0979649fa # v0.4.0
       - name: Validate ${{ matrix.base }} AMI
-        run: uds run --no-progress validate-ami-${{ matrix.base }}
+        run: uds run --no-progress validate-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }}
       - name: Build ${{ matrix.base }} AMI
-        run: uds run --no-progress build-ami-${{ matrix.base }}
+        run: uds run --no-progress build-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }}
