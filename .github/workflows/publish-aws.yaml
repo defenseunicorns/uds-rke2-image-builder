@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         base: ["ubuntu", "rhel"]
-        aws_env: ["commercial, govcloud"]
+        aws_env: ["commercial", "govcloud"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
