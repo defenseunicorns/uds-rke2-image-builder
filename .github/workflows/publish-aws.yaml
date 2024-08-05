@@ -21,6 +21,7 @@ jobs:
     strategy:
       matrix:
         base: ["ubuntu", "rhel"]
+        rke2_version: ["v1.28.11+rke2r1", "v1.29.6+rke2r1", "v1.30.2+rke2r1"]
         aws_env: ["commercial"]
     steps:
       - name: Checkout Code
@@ -41,9 +42,9 @@ jobs:
         with:
           tofu_wrapper: false
           tofu_version: 1.6.2
-      - name: Publish ${{ matrix.base }} AMI
-        run: uds run --no-progress publish-ami-${{ matrix.base }}
-      - name: Test ${{ matrix.base }} AMI
+      - name: Publish ${{ matrix.base }} ${{rke2_version}} AMI
+        run: uds run --no-progress publish-ami-${{ matrix.base }} --set RKE2_VERSION=${{ matrix.rke2_version }}
+      - name: Test ${{ matrix.base }} ${{rke2_version}} AMI
         shell: bash -e -o pipefail {0}
         env:
           KUBECONFIG: "/home/runner/.kube/rke2-config"
@@ -52,7 +53,7 @@ jobs:
         shell: bash -e -o pipefail {0}
         if: always()
         run: uds run --no-progress teardown-infra --set DISTRO=${{ matrix.base }}
-      - name: Cleanup ${{ matrix.base }} AMI on failure
+      - name: Cleanup ${{ matrix.base }} ${{rke2_version}} AMI on failure
         shell: bash -e -o pipefail {0}
         if: failure()
         run: uds run --no-progress cleanup-ami

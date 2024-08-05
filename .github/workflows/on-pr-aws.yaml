@@ -20,6 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         base: ["ubuntu", "rhel"]
+        rke2_version: ["v1.28.11+rke2r1", "v1.29.6+rke2r1", "v1.30.2+rke2r1"]
         aws_env: ["commercial"]
     steps:
       - name: Checkout Code
@@ -36,6 +37,6 @@ jobs:
         if: always()
         uses: defenseunicorns/uds-common/.github/actions/setup@a6fba9c0084319325d70816a3481aec0979649fa # v0.4.0
       - name: Validate ${{ matrix.base }} AMI
-        run: uds run --no-progress validate-ami-${{ matrix.base }}
+        run: uds run --no-progress validate-ami-${{ matrix.base }} --set RKE2_VERSION=${{ matrix.rke2_version }}
       - name: Build ${{ matrix.base }} AMI
-        run: uds run --no-progress build-ami-${{ matrix.base }}
+        run: uds run --no-progress build-ami-${{ matrix.base }} --set RKE2_VERSION=${{ matrix.rke2_version }}

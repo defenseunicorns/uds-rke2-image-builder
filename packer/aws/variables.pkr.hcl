@@ -29,7 +29,6 @@ variable "base_ami_name" {
 variable "rke2_version" {
   type        = string
   description = "RKE2 version to install on the AMI"
-  default     = "v1.29.3+rke2r1"
 }
 
 variable "ubuntu_pro_token" {
