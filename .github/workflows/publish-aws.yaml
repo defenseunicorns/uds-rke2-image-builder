@@ -22,6 +22,7 @@ jobs:
       matrix:
         base: ["ubuntu", "rhel"]
         aws_env: ["commercial", "govcloud"]
+        rke2_version: ["v1.28.11+rke2r1", "v1.29.6+rke2r1", "v1.30.2+rke2r1"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
@@ -50,9 +51,9 @@ jobs:
         with:
           tofu_wrapper: false
           tofu_version: 1.6.2
-      - name: Publish ${{ matrix.base }} AMI
-        run: uds run --no-progress publish-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }}
-      - name: Test ${{ matrix.base }} AMI
+      - name: Publish ${{ matrix.base }} ${{rke2_version}} AMI
+        run: uds run --no-progress publish-ami-${{ matrix.base }} ---set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }}
+      - name: Test ${{ matrix.base }} ${{rke2_version}} AMI
         shell: bash -e -o pipefail {0}
         env:
           KUBECONFIG: "/home/runner/.kube/rke2-config"
@@ -61,7 +62,7 @@ jobs:
         shell: bash -e -o pipefail {0}
         if: always()
         run: uds run --no-progress teardown-infra --set DISTRO=${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }}
-      - name: Cleanup ${{ matrix.base }} AMI on failure
+      - name: Cleanup ${{ matrix.base }} ${{rke2_version}} AMI on failure
         shell: bash -e -o pipefail {0}
         if: failure()
         run: uds run --no-progress cleanup-ami --set AWS_REGION=${{ env.AWS_REGION }}

@@ -21,6 +21,7 @@ jobs:
       matrix:
         base: ["ubuntu", "rhel"]
         aws_env: ["commercial", "govcloud"]
+        rke2_version: ["v1.28.11+rke2r1", "v1.29.6+rke2r1", "v1.30.2+rke2r1"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
@@ -44,7 +45,7 @@ jobs:
       - name: Setup UDS
         if: always()
         uses: defenseunicorns/uds-common/.github/actions/setup@a6fba9c0084319325d70816a3481aec0979649fa # v0.4.0
-      - name: Validate ${{ matrix.base }} AMI
-        run: uds run --no-progress validate-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }}
-      - name: Build ${{ matrix.base }} AMI
-        run: uds run --no-progress build-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }}
+      - name: Validate ${{ matrix.base }} ${{ matrix.aws_env }} AMI
+        run: uds run --no-progress validate-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }}
+      - name: Build ${{ matrix.base }} ${{ matrix.aws_env }} AMI
+        run: uds run --no-progress build-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }}
