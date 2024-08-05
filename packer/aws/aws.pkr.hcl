@@ -26,7 +26,7 @@ source "amazon-ebs" "base" {
   ami_name        = local.ami_name
   ami_regions     = var.ami_regions
   ami_description = "For UDS deployments on RKE2"
-  instance_type   = "t3.small"
+  instance_type   = "t2.small"
   region          = var.region
   ssh_username    = var.ssh_username
   source_ami      = data.amazon-ami.base-ami.id
@@ -48,7 +48,7 @@ build {
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/install-deps.sh"
-    timeout         = "20m"
+    timeout         = "30m"
   }
 
   provisioner "shell" {

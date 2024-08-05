@@ -19,6 +19,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false # Ensure each matrix job will not be interrupted by the failure of another
       matrix:
         base: ["ubuntu", "rhel"]
         aws_env: ["commercial", "govcloud"]
