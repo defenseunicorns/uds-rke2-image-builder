@@ -69,6 +69,7 @@ build {
     // RKE2 artifact unpacking/install must be run as root
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/rke2-install.sh"
+    expect_disconnect = true // Sometimes the connection is lost during the install
     timeout         = "15m"
   }
 
