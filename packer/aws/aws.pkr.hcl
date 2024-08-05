@@ -71,6 +71,7 @@ build {
     script          = "../scripts/rke2-install.sh"
     expect_disconnect = true // Sometimes the connection is lost during the install
     timeout         = "15m"
+    max_retries = 3 # Occasionally first-attempt will fail, potentially due to the restart mandated by os-stig.sh
   }
 
   provisioner "shell" {
