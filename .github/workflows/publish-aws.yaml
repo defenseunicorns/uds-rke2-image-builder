@@ -42,9 +42,9 @@ jobs:
         with:
           tofu_wrapper: false
           tofu_version: 1.6.2
-      - name: Publish ${{ matrix.base }} ${{rke2_version}} AMI
+      - name: Publish ${{ matrix.base }} ${{ matrix.rke2_version }} AMI
         run: uds run --no-progress publish-ami-${{ matrix.base }} --set RKE2_VERSION=${{ matrix.rke2_version }}
-      - name: Test ${{ matrix.base }} ${{rke2_version}} AMI
+      - name: Test ${{ matrix.base }} ${{ matrix.rke2_version }} AMI
         shell: bash -e -o pipefail {0}
         env:
           KUBECONFIG: "/home/runner/.kube/rke2-config"
@@ -53,7 +53,7 @@ jobs:
         shell: bash -e -o pipefail {0}
         if: always()
         run: uds run --no-progress teardown-infra --set DISTRO=${{ matrix.base }}
-      - name: Cleanup ${{ matrix.base }} ${{rke2_version}} AMI on failure
+      - name: Cleanup ${{ matrix.base }} ${{ matrix.rke2_version }} AMI on failure
         shell: bash -e -o pipefail {0}
         if: failure()
         run: uds run --no-progress cleanup-ami
