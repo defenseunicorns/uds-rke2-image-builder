@@ -58,12 +58,12 @@ jobs:
         shell: bash -e -o pipefail {0}
         env:
           KUBECONFIG: "/home/runner/.kube/rke2-config"
-        run: uds run --no-progress test-cluster --set SHA=${{ github.sha }} --set DISTRO=${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }}
+        run: uds run --no-progress test-cluster --set SHA=${{ github.sha }} --set DISTRO=${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }}
       - name: Teardown test infrastructure
         shell: bash -e -o pipefail {0}
         if: always()
-        run: uds run --no-progress teardown-infra --set DISTRO=${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }}
+        run: uds run --no-progress teardown-infra --set DISTRO=${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }}
       - name: Cleanup ${{ matrix.base }} ${{ matrix.rke2_version }} AMI on failure
         shell: bash -e -o pipefail {0}
         if: failure()
-        run: uds run --no-progress cleanup-ami --set AWS_REGION=${{ env.AWS_REGION }}
+        run: uds run --no-progress cleanup-ami --set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }}

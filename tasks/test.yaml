@@ -16,6 +16,8 @@ variables:
     description: "AWS region to build the AMI in"
   - name: DISTRO
     description: "The distro to test with for test targets"
+  - name: RKE2_VERSION
+    description: "RKE2 version that is being tested"
   - name: SHA
     description: "The sha to use for the state of the test infra"
 
@@ -38,15 +40,25 @@ tasks:
     description: "Test the AMI with the baked in RKE2 startup script"
     actions:
       - cmd: |
+          # Set variables based on whether we are in govcloud or commercial
+          if [ "$AWS_REGION" == "us-gov-west-1" ]; then
+              state_bucket="uds-ci-govcloud-us-gov-west-1-tfstate"
+              vpc_name="uds-ci-govcloud-*"
+              subnet_name="uds-ci-govcloud-*-public*"
+          else
+              state_bucket="uds-aws-ci-commercial-us-west-2-5246-tfstate"
+              vpc_name="uds-ci-commercial-*"
+              subnet_name="uds-ci-commercial-*-public*"
+          fi
           root_dir=$(pwd)
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           echo "TEST AMI: ${TEST_AMI_ID}"
           cd ${E2E_TEST_DIR}/rke2-cluster
           tofu init -force-copy \
-            -backend-config="bucket=uds-aws-ci-commercial-us-west-2-5246-tfstate" \
-            -backend-config="key=tfstate/ci/install/${SHA}-packer-${DISTRO}-rke2-startup-script.tfstate" \
-            -backend-config="region=us-west-2"
-          tofu apply -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
+            -backend-config="bucket=${state_bucket}" \
+            -backend-config="key=tfstate/ci/install/${SHA}-packer-${DISTRO}-${RKE2_VERSION}-rke2-startup-script.tfstate" \
+            -backend-config="region=${AWS_REGION}"
+          tofu apply -var="region=${AWS_REGION}" -var="vpc_name=${vpc_name}" -var="subnet_name=${subnet_name}" -var="ami_id=${TEST_AMI_ID}" -var="rke2_version=${RKE2_VERSION}" -var-file="${DISTRO}.tfvars" -auto-approve
           source ${root_dir}/${E2E_TEST_DIR}/scripts/get-kubeconfig.sh
         shell:
           darwin: "bash"
@@ -70,10 +82,18 @@ tasks:
     description: "Destroy test infrastructure"
     actions:
       - cmd: |
+          # Set variables based on whether we are in govcloud or commercial
+          if [ "$AWS_REGION" == "us-gov-west-1" ]; then
+              vpc_name="uds-ci-govcloud-*"
+              subnet_name="uds-ci-govcloud-*-public*"
+          else
+              vpc_name="uds-ci-commercial-*"
+              subnet_name="uds-ci-commercial-*-public*"
+          fi
           TEST_AMI_ID=$(jq -r '.builds[-1].artifact_id' ${AWS_DIR}/manifest.json | cut -d ":" -f2)
           echo "TEST AMI: ${TEST_AMI_ID}"
           cd ${E2E_TEST_DIR}/rke2-cluster
-          tofu destroy -var="ami_id=${TEST_AMI_ID}" -var-file="${DISTRO}.tfvars" -auto-approve
+          tofu destroy -var="region=${AWS_REGION}" -var="vpc_name=${vpc_name}" -var="subnet_name=${subnet_name}" -var="ami_id=${TEST_AMI_ID}" -var="rke2_version=${RKE2_VERSION}" -var-file="${DISTRO}.tfvars" -auto-approve
 
   - name: cleanup-ami
     description: "Cleans up snapshots and AMIs previously published"
