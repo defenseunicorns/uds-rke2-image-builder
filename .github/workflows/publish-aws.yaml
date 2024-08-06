@@ -8,8 +8,11 @@ on:
       - "packer/aws/**"
       - "packer/scripts/**"
       - ".github/workflows/publish-aws.yaml"
+      - "tasks/aws.yaml"
+      - "tasks/test.yaml"
   schedule:
     - cron: '0 6 1 * *' # Runs monthly at midnight MST
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 permissions:
   id-token: write
