@@ -41,7 +41,7 @@ tasks:
     actions:
       - cmd: |
           # Set variables based on whether we are in govcloud or commercial
-          if [ "$AWS_REGION" == "us-gov-west-1" ]; then
+          if [ "$AWS_REGION" = "us-gov-west-1" ]; then
               state_bucket="uds-ci-govcloud-us-gov-west-1-tfstate"
               vpc_name="uds-ci-govcloud-*"
               subnet_name="uds-ci-govcloud-*-public*"
@@ -83,7 +83,7 @@ tasks:
     actions:
       - cmd: |
           # Set variables based on whether we are in govcloud or commercial
-          if [ "$AWS_REGION" == "us-gov-west-1" ]; then
+          if [ "$AWS_REGION" = "us-gov-west-1" ]; then
               vpc_name="uds-ci-govcloud-*"
               subnet_name="uds-ci-govcloud-*-public*"
           else
