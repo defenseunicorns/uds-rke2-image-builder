@@ -60,18 +60,18 @@ build {
     script            = "../scripts/os-stig.sh"
     expect_disconnect = true // Expect a restart due to FIPS reboot
     timeout           = "20m"
+    pause_after       = "30s" // Give a grace period for the OS to restart
   }
 
   provisioner "shell" {
+    pause_before = "30s" # Gives a grace period for the OS to restart from previous provisioner
     environment_vars = [
       "INSTALL_RKE2_VERSION=${var.rke2_version}"
     ]
     // RKE2 artifact unpacking/install must be run as root
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/rke2-install.sh"
-    expect_disconnect = true // Sometimes the connection is lost during the install
     timeout         = "15m"
-    max_retries = 3 # Occasionally first-attempt will fail, potentially due to the restart mandated by os-stig.sh
   }
 
   provisioner "shell" {
