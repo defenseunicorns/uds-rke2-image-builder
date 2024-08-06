@@ -8,6 +8,7 @@ on:
       - "packer/aws/**"
       - "packer/scripts/**"
       - ".github/workflows/on-pr-aws.yaml"
+      - "tasks/aws.yaml"
 
 permissions:
   id-token: write
