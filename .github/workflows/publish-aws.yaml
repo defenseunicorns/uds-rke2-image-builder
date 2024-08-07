@@ -49,7 +49,7 @@ jobs:
           role-duration-seconds: 21600
       - name: Setup UDS
         if: always()
-        uses: defenseunicorns/uds-common/.github/actions/setup@a6fba9c0084319325d70816a3481aec0979649fa # v0.4.0
+        uses: defenseunicorns/uds-common/.github/actions/setup@76287d41ec5f06ecbdd0a6453877a78675aceffe # v0.11.2
       - name: Setup Tofu
         uses: opentofu/setup-opentofu@ae80d4ecaab946d8f5ff18397fbf6d0686c6d46a # v1.0.3
         with:
