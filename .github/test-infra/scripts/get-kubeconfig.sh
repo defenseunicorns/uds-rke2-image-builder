@@ -17,8 +17,8 @@ echo "node_user: ${node_user}"
 cluster_hostname=$(tofu output -raw cluster_hostname)
 echo "cluster_hostname: ${cluster_hostname}"
 
-# Try ssh up to 10 times waiting 15 seconds between tries
-for i in $(seq 1 10); do
+# Try ssh up to 20 times waiting 15 seconds between tries
+for i in $(seq 1 20); do
     echo "Waiting on cloud-init to finish running on cluster node"
     ssh -o StrictHostKeyChecking=no -i key.pem ${node_user}@${bootstrap_ip} "cloud-init status --wait" && break
     sleep 15
