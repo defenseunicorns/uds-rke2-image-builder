@@ -13,13 +13,14 @@
       "matchFileNames": [".github/**"],
       "groupName": "githubactions",
       "commitMessageTopic": "githubactions",
-      "pinDigests": true
+      "pinDigests": true,
+      "excludePackageNames": ["rancher/rke2"]
     },
     {
       "matchDatasources": ["github-releases"],
-      "matchPackageNames": ["rancher/rke2"],
+      "matchDepNames": ["rancher/rke2"],
       "commitMessageTopic": "rke2",
-      "updateTypes": ["patch"]
+      "separateMinorPatch": true
     }
   ],
   "regexManagers": [
