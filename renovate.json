@@ -13,7 +13,24 @@
       "matchFileNames": [".github/**"],
       "groupName": "githubactions",
       "commitMessageTopic": "githubactions",
-      "pinDigests": true
+      "pinDigests": true,
+      "excludePackageNames": ["rancher/rke2"]
+    },
+    {
+      "matchDatasources": ["github-releases"],
+      "matchDepNames": ["rancher/rke2"],
+      "commitMessageTopic": "rke2",
+      "separateMinorPatch": true
+    }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [".*\\.ya?ml$"],
+      "matchStrings": [
+        "(?<currentValue>v\\d+\\.\\d+\\.\\d\\+rke2r\\d+)"
+      ],
+      "depNameTemplate": "rancher/rke2",
+      "datasourceTemplate": "github-releases"
     }
   ]
 }

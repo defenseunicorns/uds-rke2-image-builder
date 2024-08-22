@@ -4,13 +4,19 @@ set -e
 # Detect distro, ubuntu or rhel supported
 DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel)' | uniq )
 
-# sysctl changes for Big Bang apps - https://docs-bigbang.dso.mil/latest/docs/prerequisites/os-preconfiguration/
+# sysctl changes for UDS Core apps - (originally from https://docs-bigbang.dso.mil/latest/docs/prerequisites/os-preconfiguration/)
 declare -A sysctl_settings
-sysctl_settings["vm.max_map_count"]=524288
 sysctl_settings["fs.nr_open"]=13181250
-sysctl_settings["fs.file-max"]=13181250
 sysctl_settings["fs.inotify.max_user_instances"]=1024
 sysctl_settings["fs.inotify.max_user_watches"]=1048576
+
+# sysctl changes for UDS SWF apps
+# GitLab Runner (Buildah) (note - this is a STIG finding but is n/a when running Linux containers: https://www.stigviewer.com/stig/red_hat_enterprise_linux_9/2023-09-13/finding/V-257816)
+sysctl_settings["user.max_user_namespaces"]=30110
+
+# SonarQube
+sysctl_settings["vm.max_map_count"]=524288
+sysctl_settings["fs.file-max"]=13181250
 
 for key in "${!sysctl_settings[@]}"; do
   value="${sysctl_settings[$key]}"

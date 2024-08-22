@@ -62,6 +62,11 @@ variable "os_distro" {
   description = "OS distribution used to distinguish test infra based on which test created it"
 }
 
+variable "rke2_version" {
+  type        = string
+  description = "RKE2 version used to distinguish test infra based on which test created it"
+}
+
 variable "default_user" {
   type        = string
   description = "Default user of AMI"

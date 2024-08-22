@@ -26,7 +26,7 @@ source "amazon-ebs" "base" {
   ami_name        = local.ami_name
   ami_regions     = var.ami_regions
   ami_description = "For UDS deployments on RKE2"
-  instance_type   = "t2.micro"
+  instance_type   = "t2.small"
   region          = var.region
   ssh_username    = var.ssh_username
   source_ami      = data.amazon-ami.base-ami.id
@@ -48,7 +48,7 @@ build {
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/install-deps.sh"
-    timeout         = "20m"
+    timeout         = "30m"
   }
 
   provisioner "shell" {
@@ -60,9 +60,11 @@ build {
     script            = "../scripts/os-stig.sh"
     expect_disconnect = true // Expect a restart due to FIPS reboot
     timeout           = "20m"
+    pause_after       = "30s" // Give a grace period for the OS to restart
   }
 
   provisioner "shell" {
+    pause_before = "30s" # Gives a grace period for the OS to restart from previous provisioner
     environment_vars = [
       "INSTALL_RKE2_VERSION=${var.rke2_version}"
     ]
