@@ -34,31 +34,31 @@ variable "RAM" {
   description = "RAM in MB to make available to Packer build VM"
 }
 
-variable "uds_datacenter_name" {
+variable "datacenter_name" {
   type        = string
-  default     = "UDS_DC"
+  default     = "DC"
   description = "Name of the vSphere Datacenter to use for the Packer build"
 }
 
-variable "uds_datastore_name" {
+variable "datastore_name" {
   type        = string
   default     = "192.168.10.3-ds"
   description = "Name of the vSphere Datacenter to use for the Packer build"
 }
 
-variable "uds_packer_folder_name" {
+variable "packer_folder_name" {
   type        = string
-  default     = "UDS_Node_Builds"
+  default     = "Node_Builds"
   description = "Name of the folder in which to place the Packer VM"
 }
 
-variable "uds_packer_vm_shutdown_timeout" {
+variable "packer_vm_shutdown_timeout" {
   type = string
   default = "7m"
   description = "Amount of time to wait for the Packer VM to shut down after the build is complete."
 }
 
-variable "uds_packer_vm_shutdown_command" {
+variable "packer_vm_shutdown_command" {
   type = string
   default = ""
   description = "Shut down command after the build is complete."
@@ -90,31 +90,31 @@ variable "http_ip" {
   description = "IP address to serve the kickstart file at"
 }
 
-variable "uds_packer_cluster_name" {
+variable "packer_cluster_name" {
   type        = string
-  default     = "UDS_CC"
+  default     = "CC"
   description = "Name of the vSphere compute cluster to use for the Packer VM"
 }
 
-variable "uds_datastore_cluster_name" {
+variable "datastore_cluster_name" {
   type        = string
-  default     = "UDS_DSC"
+  default     = "DSC"
   description = "Name of the vsphere datastore to create."
 }
 
-variable "uds_content_library_name" {
+variable "content_library_name" {
   type        = string
-  default     = "UDS_CL-192.168.10.3"
+  default     = "CL-192.168.10.3"
   description = "Content library storing iso used for UDS node build"
 }
 
-variable "uds_iso_filepath" {
+variable "iso_filepath" {
   type        = string
   default     = "rhel-9.4-x86_64-dvd/rhel-9.4-x86_64-dvd.iso"
-  description = "File path for iso within uds_iso_content_library used for UDS node build"
+  description = "File path for iso within iso_content_library used for UDS node build"
 }
 
-variable "uds_os_type" {
+variable "os_type" {
   type        = string
   default     = "rhel9_64Guest"
   description = "guestid for VM. See https://docs.vmware.com/en/VMware-HCX/4.9/hcx-user-guide/GUID-D4FFCBD6-9FEC-44E5-9E26-1BD0A2A81389.html for a (slightly outdated) list"
@@ -188,19 +188,19 @@ variable "k8s_distro" {
   description = "The Kubernetes distribution being installed"
 }
 
-variable "uds_packer_vm_name" {
+variable "packer_vm_name" {
   type = string
-  default = "uds_node"
+  default = "node"
   description = "Name for the VM created in vSphere by Packer"
 }
 
-variable "uds_content_library_item_description" {
+variable "content_library_item_description" {
   type = string
   default = null
   description = "Description for the item published to the vSphere content library"
 }
 
-variable "uds_content_library_item_name" {
+variable "content_library_item_name" {
   type = string
   default = null
   description = "Name for the item published to the vSphere content library"

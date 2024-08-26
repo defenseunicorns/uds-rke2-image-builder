@@ -2,7 +2,7 @@ vsphere_username = "admin"
 vsphere_password = "nicepassword"
 vsphere_server = "my.vcenter.local"
 CPUs = "4"
-uds_datastore_name = "node_datastore"
+datastore_name = "node_datastore"
 vm_ip_cidr = "10.0.0.0/24"
 network_adapters = [
   {
@@ -14,4 +14,3 @@ network_adapters = [
     network_card = "pvrdma"
   }
 ]
-k8s_node_role = "worker"

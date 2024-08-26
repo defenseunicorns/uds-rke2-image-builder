@@ -13,11 +13,11 @@ packer {
 }
 
 locals {
-  vm_name = "${var.uds_packer_vm_name}_${var.k8s_distro}"
-  uds_content_library_item_description = var.uds_content_library_item_description != null ? var.uds_content_library_item_description : local.vm_name
-  shutdown_command = var.uds_packer_vm_shutdown_command == "" ? "sudo su -c \"shutdown -P now\"" : var.uds_packer_vm_shutdown_command 
+  vm_name = "${var.packer_vm_name}_${var.k8s_distro}"
+  content_library_item_description = var.content_library_item_description != null ? var.content_library_item_description : local.vm_name
+  shutdown_command = var.packer_vm_shutdown_command == "" ? "sudo su -c \"shutdown -P now\"" : var.packer_vm_shutdown_command 
   http_content = {
-    "/uds.ks" = templatefile("${abspath(path.root)}/http_ks/uds_ks.pkrtpl", { 
+    "/uds.ks" = templatefile("${abspath(path.root)}/http_ks/ks.pkrtpl", { 
       root_password = bcrypt(var.root_password) 
       rhsm_username = var.rhsm_username
       rhsm_password = var.rhsm_password
@@ -33,13 +33,13 @@ source "vsphere-iso" "rke2-rhel-base" {
   username            = var.vsphere_username
   password            = var.vsphere_password
   insecure_connection = var.allow_unverified_ssl
-  datacenter          = var.uds_datacenter_name
+  datacenter          = var.datacenter_name
 
   # Temporary VM location configuration
   vm_name = local.vm_name
-  folder  = var.uds_packer_folder_name
-  cluster = var.uds_packer_cluster_name
-  datastore = var.uds_datastore_name
+  folder  = var.packer_folder_name
+  cluster = var.packer_cluster_name
+  datastore = var.datastore_name
 
   # Temporary VM network configuration
   ip_wait_address  = var.vm_ip_cidr
@@ -66,8 +66,8 @@ source "vsphere-iso" "rke2-rhel-base" {
   }
 
   # Temporary VM guest OS
-  iso_paths = ["${var.uds_content_library_name}/${var.uds_iso_filepath}"]
-  guest_os_type = var.uds_os_type
+  iso_paths = ["${var.content_library_name}/${var.iso_filepath}"]
+  guest_os_type = var.os_type
   
   # Temporary VM boot configuration
   boot_command = var.boot_command
@@ -75,7 +75,7 @@ source "vsphere-iso" "rke2-rhel-base" {
   http_ip = var.http_ip != null ? var.http_ip : "" 
   
   # Temporary VM shutdown configuration
-  shutdown_timeout = var.uds_packer_vm_shutdown_timeout
+  shutdown_timeout = var.packer_vm_shutdown_timeout
   shutdown_command = local.shutdown_command
   remove_network_adapter = true
 
@@ -88,10 +88,10 @@ source "vsphere-iso" "rke2-rhel-base" {
 
   # Content Library
   content_library_destination {
-    cluster = var.uds_packer_cluster_name
-    library = var.uds_content_library_name
-    name = var.uds_content_library_item_name != null ? var.uds_content_library_item_name : "${local.vm_name}-${formatdate("DD-MM-YYYY_hh-mm-ss",timestamp())}"
-    description = local.uds_content_library_item_description
+    cluster = var.packer_cluster_name
+    library = var.content_library_name
+    name = var.content_library_item_name != null ? var.content_library_item_name : "${local.vm_name}-${formatdate("DD-MM-YYYY_hh-mm-ss",timestamp())}"
+    description = local.content_library_item_description
     ovf = true
     skip_import = var.skip_import
     destroy = true
@@ -172,8 +172,8 @@ build {
       insecure            = var.allow_unverified_ssl
       username            = var.vsphere_username
       password            = var.vsphere_password
-      datacenter          = var.uds_datacenter_name
-      folder              = var.uds_packer_folder_name
+      datacenter          = var.datacenter_name
+      folder              = var.packer_folder_name
     }
   }
 }
