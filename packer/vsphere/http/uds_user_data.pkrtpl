@@ -1,0 +1,52 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_US
+  keyboard:
+    layout: us
+    variant: ''
+  storage:
+    layout:
+      name: lvm
+      match:
+       path: /dev/sda
+  ssh:
+    install-server: yes
+  package_update: false
+  package_upgrade: false
+  packages:
+    - htop
+    - tmux
+    - whois
+    - dnsutils
+    - jq
+    - open-vm-tools
+    - unzip
+    - libopenscap8
+    - zfsutils-linux
+    - apt-offline
+    - iptables
+    - open-iscsi
+    - nfs-common
+    - vlock
+    - chrony
+  user-data:
+    users:
+      - name: root
+        lock_passwd: false
+        hashed_passwd: "${root_password}"
+        ssh_redirect_user: false
+
+      - name: ${persistent_admin_username}
+        groups: sudo
+        shell: /bin/bash
+        lock_passwd: false
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        hashed_passwd: "${persistent_admin_password}"
+        ssh_redirect_user: false
+    ssh_pwauth: True
+    disable_root: false
+    preserve_hostname: true
+    runcmd:
+      - sed -i -e '/^[#]*PermitRootLogin/s/^.*$/PermitRootLogin yes/' /etc/ssh/sshd_config
+      - systemctl restart ssh

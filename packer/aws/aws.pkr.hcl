@@ -72,6 +72,7 @@ build {
     execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
     script          = "../scripts/rke2-install.sh"
     timeout         = "15m"
+    max_retries = 3 # Occationally first-attempt will fail, potentially due to the restart mandated by os-stig.sh
   }
 
   provisioner "shell" {
