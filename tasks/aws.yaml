@@ -2,6 +2,9 @@ variables:
   - name: AWS_DIR
     default: "packer/aws"
     description: "Directory containing AWS packer config"
+  - name: GITLAB_DIR
+    default: "packer/gitlab-runner-fleeting"
+    description: "Directory containing gitlab-runner fleeting packer config"
   - name: UBUNTU_PRO_TOKEN
     default: ""
     description: "Optional: provide Ubuntu pro token if using Ubuntu + FIPS"
@@ -27,6 +30,14 @@ tasks:
           packer init .
           packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "rke2_version=${RKE2_VERSION}" .
 
+  - name: publish-ami-ubuntu-gitlab
+    description: "Build and Publish the Ubuntu AMI for AWS for gitlab-runner fleeting"
+    actions:
+      - cmd: |
+          cd ${GITLAB_DIR}
+          packer init .
+          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" .
+
   - name: publish-ami-rhel
     description: "Build and Publish the RHEL AMI for AWS"
     actions:
@@ -43,6 +54,14 @@ tasks:
           packer init .
           packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "rke2_version=${RKE2_VERSION}" .
 
+  - name: build-ami-ubuntu-gitlab
+    description: "Build  the Ubuntu AMI for AWS for gitlab-runner fleeting"
+    actions:
+      - cmd: |
+          cd ${GITLAB_DIR}
+          packer init .
+          packer build -var "skip_create_ami=true" -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" .
+
   - name: build-ami-rhel
     description: "Build the RHEL AMI for AWS"
     actions:
@@ -56,6 +75,11 @@ tasks:
     actions:
       - cmd: cd ${AWS_DIR} && packer fmt .
 
+  - name: fmt-ami-gitlab
+    description: "Run packer fmt for the AWS AMIs"
+    actions:
+      - cmd: cd ${GITLAB_DIR} && packer fmt .
+
   - name: validate-ami-ubuntu
     description: "Run packer validation for the AWS Ubuntu AMI"
     actions:
@@ -63,6 +87,14 @@ tasks:
           cd ${AWS_DIR}
           packer init .
           packer validate --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "rke2_version=${RKE2_VERSION}" .
+
+  - name: validate-ami-ubuntu-gitlab
+    description: "Run packer validation for the AWS Ubuntu AMI"
+    actions:
+      - cmd: |
+          cd ${GITLAB_DIR}
+          packer init .
+          packer validate --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" .
 
   - name: validate-ami-rhel
     description: "Run packer validation for the AWS RHEL AMI"
