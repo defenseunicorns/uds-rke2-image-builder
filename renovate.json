@@ -27,7 +27,7 @@
     {
       "fileMatch": [".*\\.ya?ml$"],
       "matchStrings": [
-        "(?<currentValue>v\\d+\\.\\d+\\.\\d\\+rke2r\\d+)"
+        "(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+rke2r\\d+)"
       ],
       "depNameTemplate": "rancher/rke2",
       "datasourceTemplate": "github-releases"
