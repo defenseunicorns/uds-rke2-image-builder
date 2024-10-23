@@ -29,7 +29,7 @@ jobs:
         rke2_version: ["v1.28.14+rke2r1", "v1.29.9+rke2r1", "v1.30.5+rke2r1"]
     steps:
       - name: Checkout Code
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Set AWS Variables
         run: |
           if [ "${{ matrix.aws_env }}" == "commercial" ]; then
@@ -49,9 +49,9 @@ jobs:
           role-duration-seconds: 21600
       - name: Setup UDS
         if: always()
-        uses: defenseunicorns/uds-common/.github/actions/setup@76287d41ec5f06ecbdd0a6453877a78675aceffe # v0.11.2
+        uses: defenseunicorns/uds-common/.github/actions/setup@e3008473beab00b12a94f9fcc7340124338d5c08 # v0.13.1
       - name: Setup Tofu
-        uses: opentofu/setup-opentofu@ae80d4ecaab946d8f5ff18397fbf6d0686c6d46a # v1.0.3
+        uses: opentofu/setup-opentofu@12f4debbf681675350b6cd1f0ff8ecfbda62027b # v1.0.4
         with:
           tofu_wrapper: false
           tofu_version: 1.6.2
