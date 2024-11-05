@@ -15,7 +15,7 @@ variables:
     default: "[]"
     description: "List of groups to allow access to the AMI. Only supports '[]' or '[\"all\"]'"
   - name: RKE2_VERSION
-    default: "v1.29.9+rke2r1"
+    default: "v1.29.10+rke2r1"
     description: "RKE2 version to build the AMI with"
 
 tasks:
