@@ -10,6 +10,9 @@ tasks:
   - name: validate-ami-rhel
     actions:
       - task: aws:validate-ami-rhel
+  - name: validate-ami-ubuntu-gitlab
+    actions:
+      - task: aws:validate-ami-ubuntu-gitlab
 
   - name: build-ami-ubuntu
     actions:
@@ -17,6 +20,9 @@ tasks:
   - name: build-ami-rhel
     actions:
       - task: aws:build-ami-rhel
+  - name: build-ami-ubuntu-gitlab
+    actions:
+      - task: aws:build-ami-ubuntu-gitlab
 
   - name: publish-ami-ubuntu
     actions:
@@ -24,6 +30,9 @@ tasks:
   - name: publish-ami-rhel
     actions:
       - task: aws:publish-ami-rhel
+  - name: publish-ami-ubuntu-gitlab
+    actions:
+      - task: aws:publish-ami-ubuntu-gitlab
 
   - name: test-cluster
     actions:
