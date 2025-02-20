@@ -10,9 +10,9 @@ mkdir -p /tmp/ansible && chmod 700 /tmp/ansible && cd /tmp/ansible
 if [[ $DISTRO == "rhel" ]]; then
   # Determine which stigs to apply based on RHEL version
   if [[ ${VERSION} -eq 9 ]] ; then
-    curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V2R2_STIG_Ansible.zip
-  elif [[ ${VERSION} -eq 8 ]]; then
     curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_9_V2R3_STIG_Ansible.zip
+  elif [[ ${VERSION} -eq 8 ]]; then
+    curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V2R2_STIG_Ansible.zip
   else
     echo "Unrecognized RHEL version, exiting"
     exit 1
