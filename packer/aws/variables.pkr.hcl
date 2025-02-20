@@ -60,3 +60,15 @@ variable "region" {
   description = "Region that AMI should be built in"
   default     = "us-west-2"
 }
+
+variable "ami_users" {
+  type        = list(string)
+  description = "A list of account IDs that have access to launch the resulting AMI(s). By default no additional users other than the user creating the AMI has permissions to launch it."
+  default     = []
+}
+
+variable "ami_org_arns" {
+  type        = list(string)
+  description = "A list of Amazon Resource Names (ARN) of AWS Organizations that have access to launch the resulting AMI(s). By default no organizations have permission to launch the AMI."
+  default     = []
+}
