@@ -11,9 +11,9 @@ if [[ $DISTRO == "rhel" ]]; then
 
   yum update -y && yum upgrade -y
   yum install unzip nfs-utils nfs4-acl-tools lvm2 iscsi-initiator-utils python3 python3-pip -y
-  # Note: rhel yum install ansible provides outdated versions, using pip for most recent
-  python3 -m pip install --upgrade pip
-  python3 -m pip install --upgrade ansible
+  # Note: 'rhel yum install' ansible provides outdated versions not compatible with new STIGS, using pip for most recent
+  pip3 install --upgrade pip
+  pip3 install --upgrade ansible
   #  Install rke2 selinux policy
   if [[ ${VERSION} -eq 9 ]] ; then
     curl -LO "https://github.com/rancher/rke2-selinux/releases/download/v0.18.stable.1/rke2-selinux-0.18-1.el9.noarch.rpm"
