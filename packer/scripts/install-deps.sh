@@ -14,7 +14,7 @@ if [[ $DISTRO == "rhel" ]]; then
 
   # Install Ansible
   # Note: Latest versions of ansible are not available in RHEL 8 or 9 repos, need to use pip
-  yum install python3.9 python3.9-pip -y # Note python3.9 is the version that currently works with rhel8 STIGs
+  yum install python39 python39-pip -y # Note python3.9 is the version that currently works with rhel8 STIGs
   python3.9 -m pip install --upgrade ansible
   # Temporarily add /usr/local/bin to PATH to ensure ansible is available
   export PATH=$PATH:/usr/local/bin

@@ -8,7 +8,7 @@ DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel
 if [[ $DISTRO == "rhel" ]]; then
   yum remove unzip -y
   python3.9 -m pip uninstall ansible
-  yum remove python3.9 python3.9-pip -y
+  yum remove python39 python39-pip -y
 
   # Install nfs-utils here since the STIG profile seems to uninstall it
   yum install nfs-utils -y
