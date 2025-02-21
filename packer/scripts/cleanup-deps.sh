@@ -7,9 +7,8 @@ DISTRO=$( cat /etc/os-release | tr [:upper:] [:lower:] | grep -Poi '(ubuntu|rhel
 # Cleanup dependencies and utils that shouldn't be in final image
 if [[ $DISTRO == "rhel" ]]; then
   yum remove unzip -y
-  python3 -m pipx uninstall ansible
-  pip3 uninstall pipx -y
-  yum remove python3 python3-pip -y
+  python3.12 -m pip uninstall ansible
+  yum remove python3.12 python3.12-pip -y
   
   # Install nfs-utils here since the STIG profile seems to uninstall it
   yum install nfs-utils -y
