@@ -13,9 +13,11 @@ if [[ $DISTRO == "rhel" ]]; then
   yum install unzip nfs-utils nfs4-acl-tools lvm2 iscsi-initiator-utils -y
 
   # Install Ansible
-  # Note: Latest versions of ansible are not available in RHEL 8 or 9 repos, need to use pip
+  # Note: Latest versions of ansible are not available in RHEL 8 or 9 repos, need to use pipx
   yum install python3 python3-pip -y
-  pip3 install ansible
+  pip3 install pipx
+  python3 -m pipx ensurepath
+  python3 -m pipx install ansible
   # Temporarily add /usr/local/bin to PATH to ensure ansible is available
   export PATH=$PATH:/usr/local/bin
 
