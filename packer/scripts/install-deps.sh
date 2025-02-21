@@ -15,11 +15,9 @@ if [[ $DISTRO == "rhel" ]]; then
   # Install Ansible
   # Note: Latest versions of ansible are not available in RHEL 8 or 9 repos, need to use pip
   yum install python3 python3-pip -y
-
-  # Use pipx to install ansible and have it ready in the path
-  pip3 install pipx --upgrade
-  python3 -m pipx install ansible
-  python3 -m pipx ensurepath
+  pip3 install ansible
+  # Temporarily add /usr/local/bin to PATH to ensure ansible is available
+  export PATH=$PATH:/usr/local/bin
 
   #  Install rke2 selinux policy
   if [[ ${VERSION} -eq 9 ]] ; then

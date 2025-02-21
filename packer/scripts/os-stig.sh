@@ -8,6 +8,9 @@ VERSION=$( cat /etc/os-release | grep -Poi '^version="[0-9]+\.[0-9]+' | cut -d\"
 # Pull Ansible STIGs from https://public.cyber.mil/stigs/supplemental-automation-content/
 mkdir -p /tmp/ansible && chmod 700 /tmp/ansible && cd /tmp/ansible
 if [[ $DISTRO == "rhel" ]]; then
+  # Temporarily add /usr/local/bin to PATH to ensure ansible is available as it is installed via pip
+  export PATH=$PATH:/usr/local/bin
+
   # Determine which stigs to apply based on RHEL version
   if [[ ${VERSION} -eq 9 ]] ; then
     curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_9_V2R3_STIG_Ansible.zip
