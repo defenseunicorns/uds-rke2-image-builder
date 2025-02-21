@@ -10,8 +10,14 @@ if [[ $DISTRO == "rhel" ]]; then
   VERSION=$( cat /etc/os-release | grep -Poi '^version="[0-9]+\.[0-9]+' | cut -d\" -f2 | cut -d. -f1 )
 
   yum update -y && yum upgrade -y
-  yum install -y epel-release
-  yum install unzip nfs-utils nfs4-acl-tools lvm2 iscsi-initiator-utils ansible -y
+  yum install unzip nfs-utils nfs4-acl-tools lvm2 iscsi-initiator-utils -y
+
+  # Install Ansible
+  # Note: Latest versions of ansible are not available in RHEL 8 or 9 repos, need to use pip
+  yum install pipx -y
+  pipx ensurepath
+  pipx install ansible
+
   #  Install rke2 selinux policy
   if [[ ${VERSION} -eq 9 ]] ; then
     curl -LO "https://github.com/rancher/rke2-selinux/releases/download/v0.18.stable.1/rke2-selinux-0.18-1.el9.noarch.rpm"
