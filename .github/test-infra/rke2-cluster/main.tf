@@ -7,7 +7,7 @@ terraform {
   }
 }
 
-# Just using the default VPC for testing
+# Use the default VPC
 data "aws_vpc" "vpc" {
   default = true
 }
