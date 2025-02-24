@@ -36,12 +36,12 @@ jobs:
             echo "AWS_REGION=us-west-2" >> $GITHUB_ENV
             echo "AWS_ORG_ROLE_TO_ASSUME=${{ secrets.AWS_COMMERCIAL_ORG_ROLE_TO_ASSUME }}" >> $GITHUB_ENV
             echo "AWS_OLD_CI_ACCOUNT_ID=${{ secrets.AWS_OLD_COMMERCIAL_CI_ACCOUNT_ID }}" >> $GITHUB_ENV
-            echo "AWS_ORG_ARN=${{ secrets.AWS_COMMERCIAL_ORG_ARN }}" >> $GITHUB_ENV
+            echo "AMI_ORG_ARN=${{ secrets.AWS_COMMERCIAL_ORG_ARN }}" >> $GITHUB_ENV
           elif [ "${{ matrix.aws_env }}" == "govcloud" ]; then
             echo "AWS_REGION=us-gov-west-1" >> $GITHUB_ENV
             echo "AWS_ORG_ROLE_TO_ASSUME=${{ secrets.AWS_GOVCLOUD_ORG_ROLE_TO_ASSUME }}" >> $GITHUB_ENV
             echo "AWS_OLD_CI_ACCOUNT_ID=${{ secrets.AWS_OLD_GOVCLOUD_CI_ACCOUNT_ID }}" >> $GITHUB_ENV
-            echo "AWS_ORG_ARN=${{ secrets.AWS_GOVCLOUD_ORG_ARN }}" >> $GITHUB_ENV
+            echo "AMI_ORG_ARN=${{ secrets.AWS_GOVCLOUD_ORG_ARN }}" >> $GITHUB_ENV
           fi
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
@@ -59,7 +59,7 @@ jobs:
           tofu_wrapper: false
           tofu_version: 1.6.2
       - name: Publish ${{ matrix.base }} ${{ matrix.rke2_version }} AMI
-        run: uds run --no-progress publish-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }} --set AMI_USERS='["${{ env.AWS_OLD_CI_ACCOUNT_ID }}"]' --set AWS_ORG_ARNS='["${{ env.AWS_ORG_ARN }}"]'
+        run: uds run --no-progress publish-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }} --set AMI_USERS='["${{ env.AWS_OLD_CI_ACCOUNT_ID }}"]' --set AMI_ORG_ARNS='["${{ env.AWS_ORG_ARN }}"]'
       - name: Test ${{ matrix.base }} ${{ matrix.rke2_version }} AMI
         shell: bash -e -o pipefail {0}
         env:

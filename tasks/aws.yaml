@@ -14,7 +14,7 @@ variables:
   - name: PUBLISH_GROUPS
     default: "[]"
     description: "List of groups to allow access to the AMI. Only supports '[]' or '[\"all\"]'"
-  - name: AWS_ORG_ARNS
+  - name: AMI_ORG_ARNS
     default: "[]"
     description: "A list of Amazon Resource Names (ARN) of AWS Organizations that have access to launch the resulting AMI(s). By default no organizations have permission to launch the AMI."
   - name: AMI_USERS
@@ -31,7 +31,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "aws_org_arns=${AWS_ORG_ARNS}" -var "ami_users=${AMI_USERS}" -var "rke2_version=${RKE2_VERSION}" .
+          packer build -var "ubuntu_pro_token=${UBUNTU_PRO_TOKEN}" --var-file=ubuntu.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "ami_org_arns=${AMI_ORG_ARNS}" -var "ami_users=${AMI_USERS}" -var "rke2_version=${RKE2_VERSION}" .
 
   - name: publish-ami-rhel
     description: "Build and Publish the RHEL AMI for AWS"
@@ -39,7 +39,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "aws_org_arns=${AWS_ORG_ARNS}" -var "ami_users=${AMI_USERS}" -var "rke2_version=${RKE2_VERSION}" .
+          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "ami_org_arns=${AMI_ORG_ARNS}" -var "ami_users=${AMI_USERS}" -var "rke2_version=${RKE2_VERSION}" .
 
   - name: build-ami-ubuntu
     description: "Build the Ubuntu AMI for AWS"
