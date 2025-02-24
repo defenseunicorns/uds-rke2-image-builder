@@ -32,6 +32,8 @@ source "amazon-ebs" "base" {
   source_ami      = data.amazon-ami.base-ami.id
   ami_groups      = var.ami_groups
   skip_create_ami = var.skip_create_ami
+  ami_users       = var.ami_users
+  ami_org_arns    = var.ami_org_arns
 }
 
 build {
