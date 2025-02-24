@@ -60,7 +60,7 @@ jobs:
           tofu_wrapper: false
           tofu_version: 1.6.2
       - name: Publish ${{ matrix.base }} ${{ matrix.rke2_version }} AMI
-        run: uds run --no-progress publish-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }} --set AMI_USERS='[\"${{ env.AWS_OLD_CI_ACCOUNT_ID }}\"]' --set AWS_ORG_ARNS='[\"${{ env.AWS_ORG_ARN }}\"]'
+        run: uds run --no-progress publish-ami-${{ matrix.base }} --set AWS_REGION=${{ env.AWS_REGION }} --set RKE2_VERSION=${{ matrix.rke2_version }} --set AMI_USERS='["${{ env.AWS_OLD_CI_ACCOUNT_ID }}"]' --set AWS_ORG_ARNS='["${{ env.AWS_ORG_ARN }}"]'
       - name: Test ${{ matrix.base }} ${{ matrix.rke2_version }} AMI
         shell: bash -e -o pipefail {0}
         env:
