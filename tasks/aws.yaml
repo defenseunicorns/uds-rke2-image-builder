@@ -39,7 +39,7 @@ tasks:
       - cmd: |
           cd ${AWS_DIR}
           packer init .
-          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "aws_org_arns=${AWS_ORG_ARNS} -var "ami_users=${AMI_USERS} -var "rke2_version=${RKE2_VERSION}" .
+          packer build --var-file=rhel.pkrvars.hcl -var "region=${AWS_REGION}" -var "ami_regions=${PUBLISH_REGIONS}" -var "ami_groups=${PUBLISH_GROUPS}" -var "aws_org_arns=${AWS_ORG_ARNS}" -var "ami_users=${AMI_USERS}" -var "rke2_version=${RKE2_VERSION}" .
 
   - name: build-ami-ubuntu
     description: "Build the Ubuntu AMI for AWS"
