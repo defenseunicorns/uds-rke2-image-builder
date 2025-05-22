@@ -26,7 +26,7 @@ jobs:
       matrix:
         base: ["ubuntu", "rhel"]
         aws_env: ["commercial", "govcloud"]
-        rke2_version: ["v1.30.11+rke2r1", "v1.31.7+rke2r1", "v1.32.3+rke2r1"]
+        rke2_version: ["v1.30.11+rke2r1", "v1.31.9+rke2r1", "v1.32.3+rke2r1"]
     steps:
       - name: Checkout Code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
