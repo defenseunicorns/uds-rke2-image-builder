@@ -22,8 +22,7 @@ if [[ $DISTRO == "rhel" ]]; then
   fi
 elif [[ $DISTRO == "ubuntu" ]]; then
   if [[ ${VERSION} -eq 22 ]] ; then
-    # Currently there is no stig available for Ubuntu 22.04
-    curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_CAN_Ubuntu_20-04_LTS_V1R11_STIG_Ansible.zip
+    curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_CAN_Ubuntu_22-04_LTS_V2R4_STIG_Ansible.zip
   elif [[ ${VERSION} -eq 20 ]]; then
     curl -L -o ansible.zip https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_CAN_Ubuntu_20-04_LTS_V1R11_STIG_Ansible.zip
   else
