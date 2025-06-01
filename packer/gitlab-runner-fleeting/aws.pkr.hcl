@@ -1,0 +1,82 @@
+packer {
+  required_version = ">= 1.9.2"
+
+  required_plugins {
+    amazon = {
+      version = ">= 1.2.6"
+      source  = "github.com/hashicorp/amazon"
+    }
+  }
+}
+
+locals {
+  ami_name = var.timestamp ? lower("${var.ami_name}-${formatdate("YYYYMMDDhhmm", timestamp())}") : lower("${var.ami_name}")
+}
+
+data "amazon-ami" "base-ami" {
+  filters = {
+    name = var.base_ami_name
+  }
+  owners      = var.base_ami_owners
+  most_recent = true
+  region      = var.region
+}
+
+source "amazon-ebs" "base" {
+  ami_name        = local.ami_name
+  ami_regions     = var.ami_regions
+  ami_description = "For UDS deployments on RKE2"
+  instance_type   = "t2.small"
+  region          = var.region
+  ssh_username    = var.ssh_username
+  source_ami      = data.amazon-ami.base-ami.id
+  ami_groups      = var.ami_groups
+  skip_create_ami = var.skip_create_ami
+}
+
+build {
+  name    = local.ami_name
+  sources = ["source.amazon-ebs.base"]
+
+  // Ubuntu Pro subscription attachment happens during cloud-init when using a Pro AMI
+  provisioner "shell" {
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    inline          = ["cloud-init status --wait"]
+    timeout         = "20m"
+  }
+
+  provisioner "shell" {
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    script          = "../scripts/install-deps.sh"
+    timeout         = "30m"
+  }
+
+  provisioner "shell" {
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    script          = "../scripts/install-gitlab-runner.sh"
+    timeout         = "30m"
+  }
+
+  provisioner "shell" {
+    environment_vars = [
+      "UBUNTU_PRO_TOKEN=${var.ubuntu_pro_token}"
+    ]
+    // STIG-ing must be run as root
+    execute_command   = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    script            = "../scripts/os-stig.sh"
+    expect_disconnect = true // Expect a restart due to FIPS reboot
+    timeout           = "20m"
+    pause_after       = "30s" // Give a grace period for the OS to restart
+  }
+
+  provisioner "shell" {
+    execute_command = "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    script          = "../scripts/cleanup-deps.sh"
+    timeout         = "15m"
+  }
+
+  post-processor "manifest" {
+    output = "manifest.json"
+  }
+
+}
