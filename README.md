@@ -1,7 +1,7 @@
 # UDS RKE2 Image Builder
 
 This repo contains Packer code to produce STIG'd RKE2 images for various environments. Built images will have:
-- Base OS (currently supporting RHEL 8 and Ubuntu 20.04)
+- Base OS (currently supporting RHEL and Ubuntu)
 - STIGs applied to the OS
 - RKE2 pre-installed, STIG'd, and airgap ready (all images pre-installed)
 
