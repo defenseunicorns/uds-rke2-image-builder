@@ -14,10 +14,11 @@ if [[ $DISTRO == "rhel" ]]; then
 
   # Install Ansible
   if [[ ${VERSION} -eq 9 ]]; then
-    yum install ansible -y
+    # On RHEL 9 we can install with yum
+    yum install ansible-core -y
   else
-    # On RHEL 8 ansible must be installed from python/pip
-    yum install python39 python39-pip -y # Note python3.9 is the version that currently works with rhel8 STIGs
+    # In RHEL 8, we need to use pip
+    yum install python39 python39-pip -y
     python3.9 -m pip install --upgrade ansible
   fi
   # Temporarily add /usr/local/bin to PATH to ensure ansible is available
@@ -25,11 +26,11 @@ if [[ $DISTRO == "rhel" ]]; then
 
   #  Install rke2 selinux policy
   if [[ ${VERSION} -eq 9 ]] ; then
-    curl -LO "https://github.com/rancher/rke2-selinux/releases/download/v0.18.stable.1/rke2-selinux-0.18-1.el9.noarch.rpm"
-    yum install rke2-selinux-0.18-1.el9.noarch.rpm -y
+    curl -LO "https://github.com/rancher/rke2-selinux/releases/download/v0.20.stable.1/rke2-selinux-0.20-1.el9.noarch.rpm"
+    yum install rke2-selinux-0.20-1.el9.noarch.rpm -y
   elif [[ ${VERSION} -eq 8 ]]; then
-    curl -LO "https://github.com/rancher/rke2-selinux/releases/download/v0.17.stable.1/rke2-selinux-0.17-1.el8.noarch.rpm"
-    yum install rke2-selinux-0.17-1.el8.noarch.rpm -y
+    curl -LO "https://github.com/rancher/rke2-selinux/releases/download/v0.20.stable.1/rke2-selinux-0.20-1.el8.noarch.rpm"
+    yum install rke2-selinux-0.20-1.el8.noarch.rpm -y
   else
     echo "Unrecognized RHEL version, exiting"
     exit 1
