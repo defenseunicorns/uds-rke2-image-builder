@@ -13,13 +13,10 @@ if [[ $DISTRO == "rhel" ]]; then
   yum install unzip nfs-utils nfs4-acl-tools lvm2 iscsi-initiator-utils -y
 
   # Install Ansible
-  # Note: Latest versions of ansible are not available in RHEL 8 or 9 repos, need to use pip
   if [[ ${VERSION} -eq 9 ]]; then
-    # RHEL 9 uses different package names
-    yum install python3 python3-pip -y
-    python3 -m pip install --upgrade ansible
+    yum install ansible -y
   else
-    # RHEL 8 uses python39 packages
+    # On RHEL 8 ansible must be installed from python/pip
     yum install python39 python39-pip -y # Note python3.9 is the version that currently works with rhel8 STIGs
     python3.9 -m pip install --upgrade ansible
   fi
