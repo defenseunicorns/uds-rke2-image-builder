@@ -43,7 +43,7 @@ elif [[ $DISTRO == "ubuntu" ]]; then
   apt-get update -y && apt-get upgrade -y
   apt-get install software-properties-common -y
   add-apt-repository -y --update ppa:ansible/ansible
-  apt-get install ansible unzip jq -y
+  apt-get install ansible-core unzip jq -y
   # Install lvm2 for storage (e.x. rook/ceph)
   apt-get install lvm2 -y
   # Keep CA Certs up to date
