@@ -34,9 +34,11 @@ runs:
         tofu_wrapper: false
         tofu_version: 1.6.2
 
-    - name: Setup UDS
-      if: always()
-      uses: defenseunicorns/uds-common/.github/actions/setup@a6fba9c0084319325d70816a3481aec0979649fa # v0.4.0
+    - name: Install UDS CLI
+      uses: defenseunicorns/setup-uds@ab842abcad1f7a3305c2538e3dd1950d0daacfa5 # v1.0.1
+      with:
+        # renovate: datasource=github-tags depName=defenseunicorns/uds-cli versioning=semver
+        version: v0.27.7
 
     - name: Validate ${{ inputs.distro }} AMI
       shell: bash -e -o pipefail {0}
