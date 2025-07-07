@@ -50,7 +50,7 @@ if systemctl list-units --full | grep -Poi "NetworkManager.service" &>/dev/null;
   # Indent with tabs to prevent spaces in heredoc output
 	cat <<- EOF > /etc/NetworkManager/conf.d/rke2-canal.conf
 	[keyfile]
-	unmanaged-devices=interface-name:cali*;interface-name:flannel*
+	unmanaged-devices=interface-name:flannel*;interface-name:cali*;interface-name:tunl*;interface-name:vxlan.calico;interface-name:vxlan-v6.calico;interface-name:wireguard.cali;interface-name:wg-v6.cali
 	EOF
   systemctl reload NetworkManager
 fi
@@ -58,8 +58,8 @@ fi
 # If present, disable services that interfere with cluster networking - https://docs.rke2.io/known_issues#firewalld-conflicts-with-default-networking
 services_to_disable=("firewalld" "nm-cloud-setup" "nm-cloud-setup.timer")
 for service in "${services_to_disable[@]}"; do
-  if systemctl list-units --full -all | grep -Poi "$service.service" &>/dev/null; then
-    systemctl stop "$service.service"
-    systemctl disable "$service.service"
+  if systemctl list-units --full -all | grep -Poi "$service" &>/dev/null; then
+    systemctl stop "$service"
+    systemctl disable "$service"
   fi
 done
