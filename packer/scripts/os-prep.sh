@@ -46,11 +46,16 @@ elif [[ $DISTRO == "ubuntu" ]]; then
 fi
 
 # If Network Manager is being used configure it to ignore calico/flannel network interfaces - https://docs.rke2.io/known_issues#networkmanager
+# On RHEL9 DNS is set to none by the STIG script default values
 if systemctl list-units --full | grep -Poi "NetworkManager.service" &>/dev/null; then
   # Indent with tabs to prevent spaces in heredoc output
 	cat <<- EOF > /etc/NetworkManager/conf.d/rke2-canal.conf
 	[keyfile]
 	unmanaged-devices=interface-name:flannel*;interface-name:cali*;interface-name:tunl*;interface-name:vxlan.calico;interface-name:vxlan-v6.calico;interface-name:wireguard.cali;interface-name:wg-v6.cali
+	EOF
+	cat <<- EOF > /etc/NetworkManager/conf.d/dns-default.conf
+	[main]
+	dns=default
 	EOF
   systemctl reload NetworkManager
 fi
